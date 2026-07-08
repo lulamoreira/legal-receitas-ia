@@ -13,11 +13,17 @@ export function pastelForIndex(i: number) {
   return PALETTES[i % PALETTES.length]!;
 }
 
-export function RecipeCard({ recipe, index = 0 }: { recipe: Recipe; index?: number }) {
+type RecipeCardProps = {
+  recipe: Recipe;
+  index?: number;
+  to?: "/receita/$id" | "/explorar/$id";
+};
+
+export function RecipeCard({ recipe, index = 0, to = "/receita/$id" }: RecipeCardProps) {
   const p = pastelForIndex(index);
   return (
     <Link
-      to="/receita/$id"
+      to={to}
       params={{ id: recipe.id }}
       className="group block rounded-3xl p-4 shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5 hover:shadow-[var(--shadow-warm)]"
       style={{ backgroundColor: p.bg }}
