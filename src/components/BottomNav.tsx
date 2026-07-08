@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Sparkles, ShoppingCart } from "lucide-react";
+import { BookOpen, Compass, Sparkles, ShoppingCart } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 
@@ -21,6 +21,11 @@ export function BottomNav() {
         <Link to="/" activeOptions={{ exact: true }} className={item} aria-label="Receitas">
           <BookOpen className="h-5 w-5" />
           Receitas
+        </Link>
+
+        <Link to="/explorar" className={item} aria-label="Explorar">
+          <Compass className="h-5 w-5" />
+          Explorar
         </Link>
 
         <Link
