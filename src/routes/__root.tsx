@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português.",
       },
       { name: "author", content: "ReceitAI" },
-      { property: "og:title", content: "ReceitAI — Receitas de Reels organizadas pela IA" },
+      { property: "og:title", content: "ReceitAI — Suas receitas favoritas, organizadas pela IA" },
       {
         property: "og:description",
         content:
@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#FAF6EF" },
+      { name: "twitter:title", content: "ReceitAI — Suas receitas favoritas, organizadas pela IA" },
+      { name: "description", content: "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português." },
+      { property: "og:description", content: "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português." },
+      { name: "twitter:description", content: "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a32e0228-77ed-4b34-affa-70ef29172494/id-preview-0dc66834--6bc68399-1ea6-4a3a-83be-1cb050224ce2.lovable.app-1783521690357.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a32e0228-77ed-4b34-affa-70ef29172494/id-preview-0dc66834--6bc68399-1ea6-4a3a-83be-1cb050224ce2.lovable.app-1783521690357.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
