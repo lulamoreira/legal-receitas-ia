@@ -5,6 +5,7 @@ import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { AISLES, type Aisle } from "@/lib/types";
 import { formatQuantity } from "@/lib/format";
+import { pastelForIndex } from "@/components/RecipeCard";
 
 export const Route = createFileRoute("/compras")({
   component: Compras,
@@ -71,9 +72,12 @@ function Compras() {
         </div>
       ) : (
         <div className="space-y-5">
-          {grouped.map(({ aisle, items }) => (
+          {grouped.map(({ aisle, items }, sectionIdx) => {
+            const p = pastelForIndex(sectionIdx);
+            return (
             <section key={aisle}>
-              <h2 className="mb-2 px-1 font-serif text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <h2 className="mb-2 inline-flex rounded-full px-3 py-1 font-serif text-xs font-bold uppercase tracking-wider"
+                  style={{ backgroundColor: p.bg, color: p.title }}>
                 {aisle}
               </h2>
               <ul className="overflow-hidden rounded-2xl bg-card shadow-[var(--shadow-soft)]">
@@ -108,7 +112,8 @@ function Compras() {
                 ))}
               </ul>
             </section>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
