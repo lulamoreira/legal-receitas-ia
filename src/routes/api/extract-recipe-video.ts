@@ -142,7 +142,9 @@ export const Route = createFileRoute("/api/extract-recipe-video")({
             );
           }
 
+          try { await enrichRecipeWithImages(clean as never, apiKey); } catch (imgErr) { console.error("[extract-recipe-video] enrich", imgErr); }
           return Response.json(clean);
+
         } catch (e) {
           console.error("[extract-recipe-video]", e);
           const msg = e instanceof Error ? e.message : "Erro no servidor.";
