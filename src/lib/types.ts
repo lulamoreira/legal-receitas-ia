@@ -20,6 +20,7 @@ export type Ingredient = {
   note?: string;
   emoji: string;
   aisle: Aisle;
+  imageUrl?: string;
 };
 
 export type Recipe = {
@@ -33,10 +34,12 @@ export type Recipe = {
   ingredients: Ingredient[];
   steps: string[];
   sourceUrl?: string;
+  imageUrl?: string;
   createdAt: number;
 };
 
 export type ExtractedRecipe = Omit<Recipe, "id" | "createdAt">;
+
 
 export type ShoppingItem = {
   id: string;

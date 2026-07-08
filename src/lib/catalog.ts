@@ -15,6 +15,7 @@ type CatalogRow = {
   ingredients: unknown;
   steps: string[] | null;
   created_at: string;
+  image_url?: string | null;
 };
 
 function toAisle(v: unknown): Aisle {
@@ -24,6 +25,7 @@ function toAisle(v: unknown): Aisle {
 function toIngredient(raw: unknown): Ingredient {
   const r = (raw ?? {}) as Record<string, unknown>;
   const qty = Number(r.quantity);
+  const imgRaw = r.imageUrl ?? r.image_url;
   return {
     id: uid(),
     name: String(r.name ?? ""),
@@ -32,6 +34,7 @@ function toIngredient(raw: unknown): Ingredient {
     note: r.note ? String(r.note) : undefined,
     emoji: String(r.emoji ?? "🍽️"),
     aisle: toAisle(r.aisle),
+    imageUrl: typeof imgRaw === "string" && imgRaw ? imgRaw : undefined,
   };
 }
 
@@ -49,9 +52,11 @@ export function catalogRowToRecipe(row: CatalogRow): Recipe {
     tags: row.tags ?? [],
     ingredients,
     steps: row.steps ?? [],
+    imageUrl: row.image_url ?? undefined,
     createdAt: new Date(row.created_at).getTime(),
   };
 }
+
 
 export async function fetchCatalogPage(page: number): Promise<{ recipes: Recipe[]; total: number }> {
   const from = page * CATALOG_PAGE_SIZE;
