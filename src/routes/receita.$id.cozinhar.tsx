@@ -53,6 +53,9 @@ function CookMode() {
     };
   }, []);
 
+  if (!hydrated) {
+    return <div className="px-4 pt-16 text-center text-sm text-muted-foreground">Carregando…</div>;
+  }
   if (!recipe) throw notFound();
   const total = recipe.steps.length;
 
