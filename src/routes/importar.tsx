@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Sparkles, Loader2, Check, X, Upload, FileVideo, Type as TypeIcon } from "lucide-react";
+import { Sparkles, Loader2, Check, X, Upload, FileVideo, Type as TypeIcon, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import type { ExtractedRecipe } from "@/lib/types";
@@ -27,7 +27,45 @@ function Importar() {
   const [uploadPct, setUploadPct] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkLoading, setLinkLoading] = useState(false);
+
   const [preview, setPreview] = useState<ExtractedRecipe | null>(null);
+
+  async function extractFromLink() {
+    const trimmed = linkUrl.trim();
+    if (!trimmed) {
+      toast.error("Cole o link da receita primeiro.");
+      return;
+    }
+    try {
+      const u = new URL(trimmed);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error();
+    } catch {
+      toast.error("Link inválido. Use um endereço http(s) completo.");
+      return;
+    }
+    setLinkLoading(true);
+    setPreview(null);
+    try {
+      const res = await fetch("/api/extract-recipe-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 429) throw new Error("Muitas requisições. Tente novamente em instantes.");
+        if (res.status === 402) throw new Error("Créditos de IA esgotados.");
+        throw new Error(data?.error || "Não consegui extrair essa receita.");
+      }
+      setPreview({ ...data, sourceUrl: trimmed });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro inesperado.");
+    } finally {
+      setLinkLoading(false);
+    }
+  }
 
   async function extractFromText() {
     if (!caption.trim()) {
@@ -140,7 +178,7 @@ function Importar() {
         <PreviewCard preview={preview} onDiscard={() => setPreview(null)} onSave={save} />
       ) : (
         <Tabs defaultValue="text" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 rounded-full bg-secondary p-1">
+          <TabsList className="grid w-full grid-cols-3 rounded-full bg-secondary p-1">
             <TabsTrigger value="text" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <TypeIcon className="mr-1.5 h-4 w-4" />
               Colar texto
@@ -148,6 +186,10 @@ function Importar() {
             <TabsTrigger value="video" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <FileVideo className="mr-1.5 h-4 w-4" />
               Enviar vídeo
+            </TabsTrigger>
+            <TabsTrigger value="link" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
+              <Link2 className="mr-1.5 h-4 w-4" />
+              Link do site
             </TabsTrigger>
           </TabsList>
 
@@ -299,6 +341,41 @@ function Importar() {
                 <>
                   <Sparkles className="h-4 w-4" />
                   Extrair receita do vídeo
+                </>
+              )}
+            </button>
+          </TabsContent>
+
+          <TabsContent value="link" className="mt-5 space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">URL da receita</label>
+              <input
+                type="url"
+                inputMode="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://site.com/receita/..."
+                className="w-full rounded-full border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <p className="mt-2 text-xs text-muted-foreground">
+                Funciona melhor em blogs de receita. Sites que carregam por JavaScript podem não abrir.
+              </p>
+            </div>
+
+            <button
+              onClick={extractFromLink}
+              disabled={linkLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+            >
+              {linkLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Lendo a página…
+                </>
+              ) : (
+                <>
+                  <Link2 className="h-4 w-4" />
+                  Extrair receita do link
                 </>
               )}
             </button>
