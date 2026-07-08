@@ -3,8 +3,19 @@ import { useState } from "react";
 import { ArrowLeft, ChefHat, ExternalLink, ShoppingCart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { ServingsStepper } from "@/components/ServingsStepper";
 import { IngredientRow } from "@/components/IngredientRow";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/receita/$id")({
   component: RecipeDetail,
@@ -19,20 +30,23 @@ export const Route = createFileRoute("/receita/$id")({
 function RecipeDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const hydrated = useHydrated();
   const recipe = useStore((s) => s.recipes.find((r) => r.id === id));
   const deleteRecipe = useStore((s) => s.deleteRecipe);
   const addToList = useStore((s) => s.addRecipeToShoppingList);
 
   const [servings, setServings] = useState(recipe?.servings ?? 1);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
+  if (!hydrated) {
+    return <div className="px-4 pt-16 text-center text-sm text-muted-foreground">Carregando…</div>;
+  }
   if (!recipe) throw notFound();
 
   function handleDelete() {
-    if (confirm("Excluir esta receita? Essa ação não pode ser desfeita.")) {
-      deleteRecipe(recipe!.id);
-      toast.success("Receita excluída");
-      navigate({ to: "/" });
-    }
+    deleteRecipe(recipe!.id);
+    toast.success("Receita excluída");
+    navigate({ to: "/" });
   }
 
   function handleAddToList() {
@@ -51,7 +65,7 @@ function RecipeDetail() {
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <button
-          onClick={handleDelete}
+          onClick={() => setConfirmOpen(true)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-destructive shadow-sm"
           aria-label="Excluir receita"
         >
@@ -136,6 +150,21 @@ function RecipeDetail() {
           Cozinhar passo a passo
         </Link>
       </section>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir esta receita?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Essa ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Excluir</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
