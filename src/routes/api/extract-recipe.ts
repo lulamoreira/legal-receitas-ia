@@ -76,11 +76,11 @@ export const Route = createFileRoute("/api/extract-recipe")({
           const prompt = `Extraia e organize a receita a seguir. Texto original:\n\n${parsed.data.caption}`;
 
           try {
-            const { experimental_output: output } = await generateText({
+            const { output } = await generateText({
               model,
               system: SYSTEM_PROMPT,
               prompt,
-              experimental_output: Output.object({ schema: recipeSchema }),
+              output: Output.object({ schema: recipeSchema }),
             });
 
             // Clamp/sanitize
@@ -89,7 +89,7 @@ export const Route = createFileRoute("/api/extract-recipe")({
               servings: Math.max(1, Math.min(50, Math.round(output.servings || 4))),
               totalMinutes: Math.max(1, Math.min(1440, Math.round(output.totalMinutes || 30))),
               tags: (output.tags || []).slice(0, 4),
-              ingredients: (output.ingredients || []).map((i) => ({
+              ingredients: (output.ingredients || []).map((i: z.infer<typeof ingredientSchema>) => ({
                 ...i,
                 quantity: Number.isFinite(i.quantity) ? Math.max(0, i.quantity) : 0,
               })),

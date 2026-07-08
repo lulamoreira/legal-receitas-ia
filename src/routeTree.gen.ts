@@ -9,38 +9,120 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ImportarRouteImport } from './routes/importar'
+import { Route as ComprasRouteImport } from './routes/compras'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReceitaIdRouteImport } from './routes/receita.$id'
+import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
+import { Route as ReceitaIdCozinharRouteImport } from './routes/receita.$id.cozinhar'
 
+const ImportarRoute = ImportarRouteImport.update({
+  id: '/importar',
+  path: '/importar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComprasRoute = ComprasRouteImport.update({
+  id: '/compras',
+  path: '/compras',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReceitaIdRoute = ReceitaIdRouteImport.update({
+  id: '/receita/$id',
+  path: '/receita/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiExtractRecipeRoute = ApiExtractRecipeRouteImport.update({
+  id: '/api/extract-recipe',
+  path: '/api/extract-recipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReceitaIdCozinharRoute = ReceitaIdCozinharRouteImport.update({
+  id: '/cozinhar',
+  path: '/cozinhar',
+  getParentRoute: () => ReceitaIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/compras': typeof ComprasRoute
+  '/importar': typeof ImportarRoute
+  '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/receita/$id': typeof ReceitaIdRouteWithChildren
+  '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/compras': typeof ComprasRoute
+  '/importar': typeof ImportarRoute
+  '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/receita/$id': typeof ReceitaIdRouteWithChildren
+  '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/compras': typeof ComprasRoute
+  '/importar': typeof ImportarRoute
+  '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/receita/$id': typeof ReceitaIdRouteWithChildren
+  '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/compras'
+    | '/importar'
+    | '/api/extract-recipe'
+    | '/receita/$id'
+    | '/receita/$id/cozinhar'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/compras'
+    | '/importar'
+    | '/api/extract-recipe'
+    | '/receita/$id'
+    | '/receita/$id/cozinhar'
+  id:
+    | '__root__'
+    | '/'
+    | '/compras'
+    | '/importar'
+    | '/api/extract-recipe'
+    | '/receita/$id'
+    | '/receita/$id/cozinhar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComprasRoute: typeof ComprasRoute
+  ImportarRoute: typeof ImportarRoute
+  ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
+  ReceitaIdRoute: typeof ReceitaIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/importar': {
+      id: '/importar'
+      path: '/importar'
+      fullPath: '/importar'
+      preLoaderRoute: typeof ImportarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compras': {
+      id: '/compras'
+      path: '/compras'
+      fullPath: '/compras'
+      preLoaderRoute: typeof ComprasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +130,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/receita/$id': {
+      id: '/receita/$id'
+      path: '/receita/$id'
+      fullPath: '/receita/$id'
+      preLoaderRoute: typeof ReceitaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/extract-recipe': {
+      id: '/api/extract-recipe'
+      path: '/api/extract-recipe'
+      fullPath: '/api/extract-recipe'
+      preLoaderRoute: typeof ApiExtractRecipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/receita/$id/cozinhar': {
+      id: '/receita/$id/cozinhar'
+      path: '/cozinhar'
+      fullPath: '/receita/$id/cozinhar'
+      preLoaderRoute: typeof ReceitaIdCozinharRouteImport
+      parentRoute: typeof ReceitaIdRoute
+    }
   }
 }
 
+interface ReceitaIdRouteChildren {
+  ReceitaIdCozinharRoute: typeof ReceitaIdCozinharRoute
+}
+
+const ReceitaIdRouteChildren: ReceitaIdRouteChildren = {
+  ReceitaIdCozinharRoute: ReceitaIdCozinharRoute,
+}
+
+const ReceitaIdRouteWithChildren = ReceitaIdRoute._addFileChildren(
+  ReceitaIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComprasRoute: ComprasRoute,
+  ImportarRoute: ImportarRoute,
+  ApiExtractRecipeRoute: ApiExtractRecipeRoute,
+  ReceitaIdRoute: ReceitaIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
