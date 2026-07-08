@@ -20,6 +20,7 @@ export type Database = {
           description: string | null
           emoji: string | null
           id: string
+          image_url: string | null
           ingredients: Json
           servings: number
           steps: string[]
@@ -32,6 +33,7 @@ export type Database = {
           description?: string | null
           emoji?: string | null
           id?: string
+          image_url?: string | null
           ingredients?: Json
           servings?: number
           steps?: string[]
@@ -44,12 +46,31 @@ export type Database = {
           description?: string | null
           emoji?: string | null
           id?: string
+          image_url?: string | null
           ingredients?: Json
           servings?: number
           steps?: string[]
           tags?: string[]
           title?: string
           total_minutes?: number
+        }
+        Relationships: []
+      }
+      ingredient_images: {
+        Row: {
+          created_at: string
+          image_url: string
+          name_normalized: string
+        }
+        Insert: {
+          created_at?: string
+          image_url: string
+          name_normalized: string
+        }
+        Update: {
+          created_at?: string
+          image_url?: string
+          name_normalized?: string
         }
         Relationships: []
       }

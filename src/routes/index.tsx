@@ -25,16 +25,18 @@ function Index() {
     });
   }, [recipes, q]);
 
+  const latest = recipes.slice(0, 5);
+
   return (
     <div className="px-4 pt-8 pb-6">
       {!hydrated && (
         <div className="sr-only" aria-live="polite">Carregando receitas…</div>
       )}
-      <header className="mb-6 flex items-center gap-3">
-        <img src="/favicon.png" alt="Caderno de Vó" width={44} height={44} className="h-11 w-11 shrink-0" />
+      <header className="mb-6 flex items-center gap-4">
+        <img src="/favicon.png" alt="Caderno de Vó" width={64} height={64} className="h-16 w-16 shrink-0" />
         <div>
           <p className="text-sm font-medium uppercase tracking-wider text-primary">Caderno de Vó</p>
-          <h1 className="mt-1 font-serif text-3xl leading-tight text-foreground">
+          <h1 className="mt-1 font-serif text-4xl leading-tight text-foreground">
             Minhas receitas
           </h1>
         </div>
@@ -43,8 +45,40 @@ function Index() {
         {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
       </p>
 
-
-
+      {recipes.length >= 3 && (
+        <section className="mb-6">
+          <h2 className="mb-2 font-serif text-lg text-foreground">Últimas receitas</h2>
+          <div
+            className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {latest.map((r) => (
+              <Link
+                key={r.id}
+                to="/receita/$id"
+                params={{ id: r.id }}
+                className="group w-[110px] shrink-0 snap-start"
+              >
+                <div className="flex h-[110px] w-[110px] items-center justify-center overflow-hidden rounded-2xl bg-card text-4xl shadow-[var(--shadow-soft)] transition-transform group-hover:-translate-y-0.5">
+                  {r.imageUrl ? (
+                    <img
+                      src={r.imageUrl}
+                      alt={r.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span aria-hidden>{r.emoji}</span>
+                  )}
+                </div>
+                <p className="mt-1.5 line-clamp-2 text-xs font-medium leading-tight text-foreground">
+                  {r.title}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="relative mb-5">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

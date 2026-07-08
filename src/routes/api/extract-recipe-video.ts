@@ -7,6 +7,9 @@ import {
   AI_MODEL,
 } from "@/lib/recipe-extraction.server";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
+import { enrichRecipeWithImages } from "@/lib/image-generation.server";
+
+
 
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25MB — MP4 curto de ~90s
@@ -139,7 +142,9 @@ export const Route = createFileRoute("/api/extract-recipe-video")({
             );
           }
 
+          try { await enrichRecipeWithImages(clean as never, apiKey); } catch (imgErr) { console.error("[extract-recipe-video] enrich", imgErr); }
           return Response.json(clean);
+
         } catch (e) {
           console.error("[extract-recipe-video]", e);
           const msg = e instanceof Error ? e.message : "Erro no servidor.";

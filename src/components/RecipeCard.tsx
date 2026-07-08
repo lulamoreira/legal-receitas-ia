@@ -28,9 +28,19 @@ export function RecipeCard({ recipe, index = 0, to = "/receita/$id" }: RecipeCar
       className="group block rounded-3xl p-4 shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5 hover:shadow-[var(--shadow-warm)]"
       style={{ backgroundColor: p.bg }}
     >
-      <div className="mb-3 flex h-24 items-center justify-center rounded-2xl bg-white text-5xl shadow-sm">
-        <span aria-hidden>{recipe.emoji}</span>
+      <div className="mb-3 flex h-24 items-center justify-center overflow-hidden rounded-2xl bg-white text-5xl shadow-sm">
+        {recipe.imageUrl ? (
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span aria-hidden>{recipe.emoji}</span>
+        )}
       </div>
+
       <h3 className="font-serif text-lg font-bold leading-tight" style={{ color: p.title }}>
         {recipe.title}
       </h3>
