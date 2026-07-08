@@ -105,9 +105,23 @@ function Importar() {
 
   function save() {
     if (!preview) return;
-    const recipe = addRecipe(preview);
+    const cleanUrl = sanitizeHttpUrl(preview.sourceUrl);
+    const recipe = addRecipe({ ...preview, sourceUrl: cleanUrl });
     toast.success("Receita salva!");
     navigate({ to: "/receita/$id", params: { id: recipe.id } });
+  }
+
+  function sanitizeHttpUrl(u: string | undefined): string | undefined {
+    if (!u) return undefined;
+    try {
+      const parsed = new URL(u);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        return parsed.toString();
+      }
+    } catch {
+      // fallthrough
+    }
+    return undefined;
   }
 
   const videoBusy = videoPhase !== "idle";

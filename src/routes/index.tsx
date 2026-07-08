@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Sparkles } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { RecipeCard } from "@/components/RecipeCard";
 
 export const Route = createFileRoute("/")({
@@ -9,6 +10,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const hydrated = useHydrated();
   const recipes = useStore((s) => s.recipes);
   const [q, setQ] = useState("");
 
@@ -25,6 +27,9 @@ function Index() {
 
   return (
     <div className="px-4 pt-8 pb-6">
+      {!hydrated && (
+        <div className="sr-only" aria-live="polite">Carregando receitas…</div>
+      )}
       <header className="mb-6">
         <p className="text-sm font-medium uppercase tracking-wider text-primary">ReceitAI</p>
         <h1 className="mt-1 font-serif text-3xl leading-tight text-foreground">

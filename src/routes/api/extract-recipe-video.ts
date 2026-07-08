@@ -1,19 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { z } from "zod";
 import {
   VIDEO_SYSTEM_PROMPT,
   JSON_INSTRUCTION,
   recipeSchema,
   sanitizeExtracted,
 } from "@/lib/recipe-extraction.server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25MB — MP4 curto de ~90s
+const HOUR_MS = 60 * 60 * 1000;
 
 export const Route = createFileRoute("/api/extract-recipe-video")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
+          const ip = getClientIp(request);
+          if (!rateLimit(`video:${ip}`, 5, HOUR_MS)) {
+            return Response.json(
+              { error: "Muitas requisições. Tente novamente mais tarde." },
+              { status: 429 },
+            );
+          }
           const apiKey = process.env.LOVABLE_API_KEY;
           if (!apiKey) {
             return Response.json(

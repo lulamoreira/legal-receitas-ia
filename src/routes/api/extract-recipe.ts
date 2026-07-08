@@ -6,18 +6,36 @@ import {
   recipeSchema,
   sanitizeExtracted,
 } from "@/lib/recipe-extraction.server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
+
+const HOUR_MS = 60 * 60 * 1000;
 
 export const Route = createFileRoute("/api/extract-recipe")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         try {
+          const ip = getClientIp(request);
+          if (!rateLimit(`text:${ip}`, 10, HOUR_MS)) {
+            return Response.json(
+              { error: "Muitas requisições. Tente novamente mais tarde." },
+              { status: 429 },
+            );
+          }
+
           const body = await request.json().catch(() => null);
           const parsed = z
-            .object({ caption: z.string(), sourceUrl: z.string().optional() })
+            .object({
+              caption: z
+                .string()
+                .max(8000, "Legenda muito longa (máx. 8000 caracteres)."),
+              sourceUrl: z.string().optional(),
+            })
             .safeParse(body);
           if (!parsed.success) {
-            return Response.json({ error: "Legenda inválida." }, { status: 400 });
+            const msg =
+              parsed.error.issues[0]?.message ?? "Legenda inválida.";
+            return Response.json({ error: msg }, { status: 400 });
           }
 
           const apiKey = process.env.LOVABLE_API_KEY;
@@ -41,7 +59,18 @@ export const Route = createFileRoute("/api/extract-recipe")({
               prompt,
               output: Output.object({ schema: recipeSchema }),
             });
-            return Response.json(sanitizeExtracted(output));
+            const clean = sanitizeExtracted(output);
+            if (
+              !clean.title ||
+              /não foi possível identificar/i.test(clean.title) ||
+              clean.ingredients.length === 0
+            ) {
+              return Response.json(
+                { error: "Não encontrei uma receita nesse texto. Confira se colou a legenda certa." },
+                { status: 422 },
+              );
+            }
+            return Response.json(clean);
           } catch (err) {
             if (NoObjectGeneratedError.isInstance(err)) {
               return Response.json(

@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export const Route = createFileRoute("/receita/$id/cozinhar")({
   component: CookMode,
@@ -10,9 +11,51 @@ export const Route = createFileRoute("/receita/$id/cozinhar")({
 function CookMode() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const hydrated = useHydrated();
   const recipe = useStore((s) => s.recipes.find((r) => r.id === id));
   const [step, setStep] = useState(0);
 
+  // Mantém a tela acesa enquanto o usuário estiver cozinhando.
+  useEffect(() => {
+    type WakeLockSentinel = { release: () => Promise<void> };
+    let sentinel: WakeLockSentinel | null = null;
+    let released = false;
+
+    async function acquire() {
+      try {
+        const nav = navigator as unknown as {
+          wakeLock?: { request: (t: "screen") => Promise<WakeLockSentinel> };
+        };
+        if (!nav.wakeLock) return;
+        sentinel = await nav.wakeLock.request("screen");
+      } catch {
+        // Sem suporte ou permissão negada — silencioso.
+      }
+    }
+
+    function onVisibility() {
+      if (document.visibilityState === "visible" && !released) {
+        void acquire();
+      }
+    }
+
+    void acquire();
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      released = true;
+      document.removeEventListener("visibilitychange", onVisibility);
+      try {
+        void sentinel?.release();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
+
+  if (!hydrated) {
+    return <div className="px-4 pt-16 text-center text-sm text-muted-foreground">Carregando…</div>;
+  }
   if (!recipe) throw notFound();
   const total = recipe.steps.length;
 

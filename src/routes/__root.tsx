@@ -128,6 +128,12 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    // Zustand persist is configured with skipHydration to avoid SSR/CSR
+    // mismatches; trigger rehydration on the client after mount.
+    void import("../lib/store").then((m) => m.useStore.persist.rehydrate());
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background pb-20">
