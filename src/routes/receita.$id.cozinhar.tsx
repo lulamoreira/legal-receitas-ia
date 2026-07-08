@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export const Route = createFileRoute("/receita/$id/cozinhar")({
   component: CookMode,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/receita/$id/cozinhar")({
 function CookMode() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const hydrated = useHydrated();
   const recipe = useStore((s) => s.recipes.find((r) => r.id === id));
   const [step, setStep] = useState(0);
 
