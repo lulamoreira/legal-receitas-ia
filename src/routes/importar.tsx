@@ -345,6 +345,41 @@ function Importar() {
               )}
             </button>
           </TabsContent>
+
+          <TabsContent value="link" className="mt-5 space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">URL da receita</label>
+              <input
+                type="url"
+                inputMode="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://site.com/receita/..."
+                className="w-full rounded-full border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <p className="mt-2 text-xs text-muted-foreground">
+                Funciona melhor em blogs de receita. Sites que carregam por JavaScript podem não abrir.
+              </p>
+            </div>
+
+            <button
+              onClick={extractFromLink}
+              disabled={linkLoading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+            >
+              {linkLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Lendo a página…
+                </>
+              ) : (
+                <>
+                  <Link2 className="h-4 w-4" />
+                  Extrair receita do link
+                </>
+              )}
+            </button>
+          </TabsContent>
         </Tabs>
       )}
     </div>
