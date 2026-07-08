@@ -39,14 +39,11 @@ function Index() {
           </h1>
         </div>
       </header>
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
-        </p>
-      </header>
-      <p className="-mt-4 mb-4 text-sm text-muted-foreground">
+      <p className="mb-4 text-sm text-muted-foreground">
         {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
       </p>
+
+
 
 
       <div className="relative mb-5">
