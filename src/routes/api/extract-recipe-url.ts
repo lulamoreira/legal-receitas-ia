@@ -15,32 +15,96 @@ const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
 function isPrivateHost(host: string): boolean {
-  const h = host.toLowerCase();
-  if (h === "localhost" || h === "0.0.0.0" || h === "::1") return true;
+  let h = host.toLowerCase().trim();
+  // strip brackets from IPv6 literals
+  if (h.startsWith("[") && h.endsWith("]")) h = h.slice(1, -1);
+
+  if (h === "" || h === "localhost" || h === "0.0.0.0" || h === "::1" || h === "::")
+    return true;
   if (h.endsWith(".local") || h.endsWith(".internal")) return true;
-  if (/^127\./.test(h)) return true;
-  if (/^10\./.test(h)) return true;
-  if (/^192\.168\./.test(h)) return true;
-  if (/^169\.254\./.test(h)) return true;
-  const m = h.match(/^172\.(\d+)\./);
-  if (m && Number(m[1]) >= 16 && Number(m[1]) <= 31) return true;
+
+  // IPv6 disguises / dangerous ranges
+  if (h.includes(":")) {
+    if (h.startsWith("fc") || h.startsWith("fd") || h.startsWith("fe80")) return true;
+    if (h.includes("::ffff:")) return true;
+    // conservative: block any other IPv6 we don't explicitly whitelist? keep permissive: allow public IPv6
+  }
+
+  // Numeric-only hostname (decimal integer form of IPv4, e.g. 2130706433)
+  if (/^\d+$/.test(h)) return true;
+  // Hex form (0x7f000001)
+  if (/^0x[0-9a-f]+$/i.test(h)) return true;
+  // Octal-looking first octet or fully octal
+  if (/^0\d+$/.test(h)) return true;
+
+  // If it looks like an IPv4 (contains only digits and dots), require exactly 4 decimal octets
+  if (/^[\d.]+$/.test(h)) {
+    const parts = h.split(".");
+    if (parts.length !== 4) return true;
+    for (const p of parts) {
+      if (!/^\d{1,3}$/.test(p)) return true;
+      if (p.length > 1 && p.startsWith("0")) return true; // octal disguise
+      const n = Number(p);
+      if (!Number.isInteger(n) || n < 0 || n > 255) return true;
+    }
+    if (/^127\./.test(h)) return true;
+    if (/^10\./.test(h)) return true;
+    if (/^192\.168\./.test(h)) return true;
+    if (/^169\.254\./.test(h)) return true;
+    const m = h.match(/^172\.(\d+)\./);
+    if (m && Number(m[1]) >= 16 && Number(m[1]) <= 31) return true;
+  }
+
   return false;
+}
+
+function validateUrl(u: string): URL | null {
+  try {
+    const parsed = new URL(u);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+    if (isPrivateHost(parsed.hostname)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 async function fetchHtml(url: string): Promise<string | null> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      headers: {
-        "User-Agent": UA,
-        Accept: "text/html,application/xhtml+xml",
-        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
-      },
-      redirect: "follow",
-    });
-    if (!res.ok || !res.body) return null;
+    let currentUrl = url;
+    let res: Response | null = null;
+    for (let hop = 0; hop <= 3; hop++) {
+      res = await fetch(currentUrl, {
+        signal: ctrl.signal,
+        headers: {
+          "User-Agent": UA,
+          Accept: "text/html,application/xhtml+xml",
+          "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+        },
+        redirect: "manual",
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc) return null;
+        let nextUrl: string;
+        try {
+          nextUrl = new URL(loc, currentUrl).toString();
+        } catch {
+          return null;
+        }
+        const validated = validateUrl(nextUrl);
+        if (!validated) return null;
+        try {
+          await res.body?.cancel();
+        } catch {}
+        currentUrl = validated.toString();
+        continue;
+      }
+      break;
+    }
+    if (!res || !res.ok || !res.body) return null;
     const reader = res.body.getReader();
     const decoder = new TextDecoder("utf-8", { fatal: false });
     let received = 0;
@@ -65,6 +129,7 @@ async function fetchHtml(url: string): Promise<string | null> {
     clearTimeout(timer);
   }
 }
+
 
 type UnknownRec = Record<string, unknown>;
 
