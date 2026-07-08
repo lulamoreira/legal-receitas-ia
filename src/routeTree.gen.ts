@@ -13,6 +13,7 @@ import { Route as ImportarRouteImport } from './routes/importar'
 import { Route as ComprasRouteImport } from './routes/compras'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceitaIdRouteImport } from './routes/receita.$id'
+import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
 import { Route as ReceitaIdCozinharRouteImport } from './routes/receita.$id.cozinhar'
 
@@ -36,6 +37,11 @@ const ReceitaIdRoute = ReceitaIdRouteImport.update({
   path: '/receita/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiExtractRecipeVideoRoute = ApiExtractRecipeVideoRouteImport.update({
+  id: '/api/extract-recipe-video',
+  path: '/api/extract-recipe-video',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiExtractRecipeRoute = ApiExtractRecipeRouteImport.update({
   id: '/api/extract-recipe',
   path: '/api/extract-recipe',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/compras': typeof ComprasRoute
   '/importar': typeof ImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
   '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/compras': typeof ComprasRoute
   '/importar': typeof ImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
   '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/compras': typeof ComprasRoute
   '/importar': typeof ImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
   '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/compras'
     | '/importar'
     | '/api/extract-recipe'
+    | '/api/extract-recipe-video'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/compras'
     | '/importar'
     | '/api/extract-recipe'
+    | '/api/extract-recipe-video'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/compras'
     | '/importar'
     | '/api/extract-recipe'
+    | '/api/extract-recipe-video'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   ComprasRoute: typeof ComprasRoute
   ImportarRoute: typeof ImportarRoute
   ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
+  ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
   ReceitaIdRoute: typeof ReceitaIdRouteWithChildren
 }
 
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/receita/$id'
       fullPath: '/receita/$id'
       preLoaderRoute: typeof ReceitaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/extract-recipe-video': {
+      id: '/api/extract-recipe-video'
+      path: '/api/extract-recipe-video'
+      fullPath: '/api/extract-recipe-video'
+      preLoaderRoute: typeof ApiExtractRecipeVideoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/extract-recipe': {
@@ -171,6 +191,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComprasRoute: ComprasRoute,
   ImportarRoute: ImportarRoute,
   ApiExtractRecipeRoute: ApiExtractRecipeRoute,
+  ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
   ReceitaIdRoute: ReceitaIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
