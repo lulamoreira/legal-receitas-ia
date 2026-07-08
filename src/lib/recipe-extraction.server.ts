@@ -7,10 +7,11 @@ export const ingredientSchema = z.object({
   name: z.string(),
   quantity: z.number(),
   unit: z.string(),
-  note: z.string().optional(),
+  note: z.string().nullish(),
   emoji: z.string(),
-  aisle: aisleEnum,
+  aisle: z.string(),
 });
+
 
 export const recipeSchema = z.object({
   title: z.string(),
@@ -69,6 +70,7 @@ const jsonSchemaText = `{
 export const JSON_INSTRUCTION = `Responda APENAS com JSON válido (nada além de JSON) neste formato exato:\n${jsonSchemaText}`;
 
 export function sanitizeExtracted(output: z.infer<typeof recipeSchema>) {
+  const validAisles = AISLES as readonly string[];
   return {
     ...output,
     servings: Math.max(1, Math.min(50, Math.round(output.servings || 4))),
@@ -77,9 +79,12 @@ export function sanitizeExtracted(output: z.infer<typeof recipeSchema>) {
     ingredients: (output.ingredients || []).map((i) => ({
       ...i,
       quantity: Number.isFinite(i.quantity) ? Math.max(0, i.quantity) : 0,
+      aisle: (validAisles.includes(i.aisle) ? i.aisle : "Outros") as (typeof AISLES)[number],
+      note: i.note ?? undefined,
     })),
   };
 }
+
 
 export const AI_MODEL = "google/gemini-2.5-flash";
 
