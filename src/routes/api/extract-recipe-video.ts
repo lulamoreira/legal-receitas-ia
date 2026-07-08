@@ -7,6 +7,9 @@ import {
   AI_MODEL,
 } from "@/lib/recipe-extraction.server";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
+import { enrichRecipeWithImages } from "@/lib/image-generation.server";
+
+
 
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25MB — MP4 curto de ~90s

@@ -4,7 +4,9 @@ import {
   extractRecipeFromText,
   RecipeExtractionError,
 } from "@/lib/recipe-extraction.server";
+import { enrichRecipeWithImages } from "@/lib/image-generation.server";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
+
 
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -61,7 +63,9 @@ export const Route = createFileRoute("/api/extract-recipe")({
                 { status: 422 },
               );
             }
+            try { await enrichRecipeWithImages(clean as never, apiKey); } catch (imgErr) { console.error("[extract-recipe] enrich", imgErr); }
             return Response.json(clean);
+
           } catch (err) {
             if (err instanceof RecipeExtractionError) {
               console.error("[extract-recipe]", err.code, err.message, err.detail);
