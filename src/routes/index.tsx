@@ -30,15 +30,21 @@ function Index() {
       {!hydrated && (
         <div className="sr-only" aria-live="polite">Carregando receitas…</div>
       )}
-      <header className="mb-6">
-        <p className="text-sm font-medium uppercase tracking-wider text-primary">ReceitAI</p>
-        <h1 className="mt-1 font-serif text-3xl leading-tight text-foreground">
-          Minhas receitas
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
-        </p>
+      <header className="mb-6 flex items-center gap-3">
+        <img src="/favicon.png" alt="Caderno de Vó" width={44} height={44} className="h-11 w-11 shrink-0" />
+        <div>
+          <p className="text-sm font-medium uppercase tracking-wider text-primary">Caderno de Vó</p>
+          <h1 className="mt-1 font-serif text-3xl leading-tight text-foreground">
+            Minhas receitas
+          </h1>
+        </div>
       </header>
+      <p className="mb-4 text-sm text-muted-foreground">
+        {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
+      </p>
+
+
+
 
       <div className="relative mb-5">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
