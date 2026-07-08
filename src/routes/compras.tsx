@@ -16,14 +16,6 @@ function Compras() {
   const toggle = useStore((s) => s.toggleItem);
   const clear = useStore((s) => s.clearChecked);
 
-  if (!hydrated) {
-    return (
-      <div className="px-4 pt-16 text-center text-sm text-muted-foreground">
-        Carregando…
-      </div>
-    );
-  }
-
   const grouped = useMemo(() => {
     const g = new Map<Aisle, typeof list>();
     for (const item of list) {
@@ -34,6 +26,14 @@ function Compras() {
   }, [list]);
 
   const checkedCount = list.filter((i) => i.checked).length;
+
+  if (!hydrated) {
+    return (
+      <div className="px-4 pt-16 text-center text-sm text-muted-foreground">
+        Carregando…
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 pt-8 pb-6">
