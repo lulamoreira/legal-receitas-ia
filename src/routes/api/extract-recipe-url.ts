@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { z } from "zod";
 import {
-  SYSTEM_PROMPT,
-  recipeSchema,
-  sanitizeExtracted,
+  extractRecipeFromText,
+  RecipeExtractionError,
 } from "@/lib/recipe-extraction.server";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
 
@@ -13,6 +11,7 @@ const FETCH_TIMEOUT_MS = 10_000;
 const MAX_BYTES = 500 * 1024;
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+
 
 function isPrivateHost(host: string): boolean {
   let h = host.toLowerCase().trim();
