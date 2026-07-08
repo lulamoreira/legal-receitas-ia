@@ -3,10 +3,10 @@ import { Clock, Users } from "lucide-react";
 import type { Recipe } from "@/lib/types";
 
 const PALETTES = [
-  { bg: "#FFE3EC", title: "#7B2547", meta: "#B0567C", tagBg: "#FBD0DE", tagText: "#7B2547" },
-  { bg: "#FFF0C7", title: "#6B4A06", meta: "#A3770E", tagBg: "#FBE3A0", tagText: "#6B4A06" },
-  { bg: "#DFF5E9", title: "#14532D", meta: "#3F7E58", tagBg: "#BEE8D2", tagText: "#14532D" },
-  { bg: "#EDE7FB", title: "#3B2E6B", meta: "#6D5BA3", tagBg: "#DBD0F5", tagText: "#3B2E6B" },
+  { bg: "#FFE3EC", title: "#7B2547", meta: "#8A3A5C", tagBg: "#FBD0DE", tagText: "#7B2547" },
+  { bg: "#FFF0C7", title: "#6B4A06", meta: "#855F08", tagBg: "#FBE3A0", tagText: "#6B4A06" },
+  { bg: "#DFF5E9", title: "#14532D", meta: "#2E6543", tagBg: "#BEE8D2", tagText: "#14532D" },
+  { bg: "#EDE7FB", title: "#3B2E6B", meta: "#554488", tagBg: "#DBD0F5", tagText: "#3B2E6B" },
 ];
 
 export function pastelForIndex(i: number) {
