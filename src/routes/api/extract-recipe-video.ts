@@ -4,8 +4,10 @@ import {
   JSON_INSTRUCTION,
   recipeSchema,
   sanitizeExtracted,
+  AI_MODEL,
 } from "@/lib/recipe-extraction.server";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
+
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25MB — MP4 curto de ~90s
 const HOUR_MS = 60 * 60 * 1000;
@@ -62,7 +64,7 @@ export const Route = createFileRoute("/api/extract-recipe-video")({
                 "X-Lovable-AIG-SDK": "raw",
               },
               body: JSON.stringify({
-                model: "google/gemini-3-flash-preview",
+                model: AI_MODEL,
                 response_format: { type: "json_object" },
                 messages: [
                   { role: "system", content: `${VIDEO_SYSTEM_PROMPT}\n\n${JSON_INSTRUCTION}` },

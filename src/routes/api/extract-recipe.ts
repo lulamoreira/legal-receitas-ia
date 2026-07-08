@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { z } from "zod";
 import {
-  SYSTEM_PROMPT,
-  recipeSchema,
-  sanitizeExtracted,
+  extractRecipeFromText,
+  RecipeExtractionError,
 } from "@/lib/recipe-extraction.server";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
 
@@ -33,8 +31,7 @@ export const Route = createFileRoute("/api/extract-recipe")({
             })
             .safeParse(body);
           if (!parsed.success) {
-            const msg =
-              parsed.error.issues[0]?.message ?? "Legenda inválida.";
+            const msg = parsed.error.issues[0]?.message ?? "Legenda inválida.";
             return Response.json({ error: msg }, { status: 400 });
           }
 
@@ -46,42 +43,39 @@ export const Route = createFileRoute("/api/extract-recipe")({
             );
           }
 
-          const { createLovableAiGatewayProvider } = await import("@/lib/ai-gateway.server");
-          const gateway = createLovableAiGatewayProvider(apiKey);
-          const model = gateway("google/gemini-3-flash-preview");
-
-          const prompt = `Extraia e organize a receita a seguir. Texto original:\n\n${parsed.data.caption}`;
-
           try {
-            const { output } = await generateText({
-              model,
-              system: SYSTEM_PROMPT,
-              prompt,
-              output: Output.object({ schema: recipeSchema }),
-            });
-            const clean = sanitizeExtracted(output);
+            const clean = await extractRecipeFromText(
+              `Extraia e organize a receita a seguir. Texto original:\n\n${parsed.data.caption}`,
+              apiKey,
+            );
             if (
               !clean.title ||
               /não foi possível identificar/i.test(clean.title) ||
               clean.ingredients.length === 0
             ) {
               return Response.json(
-                { error: "Não encontrei uma receita nesse texto. Confira se colou a legenda certa." },
+                {
+                  error:
+                    "Não encontrei uma receita nesse texto. Confira se colou a legenda certa.",
+                },
                 { status: 422 },
               );
             }
             return Response.json(clean);
           } catch (err) {
-            if (NoObjectGeneratedError.isInstance(err)) {
-              return Response.json(
-                { error: "A IA não devolveu uma receita válida. Tente ajustar o texto." },
-                { status: 502 },
-              );
+            if (err instanceof RecipeExtractionError) {
+              console.error("[extract-recipe]", err.code, err.message, err.detail);
+              const message =
+                err.code === "not_recipe"
+                  ? "Não encontrei uma receita nesse texto. Confira se colou a legenda certa."
+                  : err.code === "invalid_json" || err.code === "empty" || err.code === "gateway"
+                    ? "A IA não devolveu uma receita válida. Tente ajustar o texto."
+                    : err.message;
+              return Response.json({ error: message }, { status: err.status });
             }
             const msg = err instanceof Error ? err.message : String(err);
-            const status = /429|rate/i.test(msg) ? 429 : /402|credit/i.test(msg) ? 402 : 500;
             console.error("[extract-recipe]", msg);
-            return Response.json({ error: msg }, { status });
+            return Response.json({ error: msg }, { status: 500 });
           }
         } catch (e) {
           console.error(e);
