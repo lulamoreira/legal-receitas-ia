@@ -1,0 +1,57 @@
+import type { Recipe } from "./types";
+
+export const SEED_RECIPES: Recipe[] = [
+  {
+    id: "seed-brigadeiro",
+    createdAt: Date.now() - 86400000,
+    title: "Brigadeiro de colher",
+    description: "Cremoso, brilhante e pronto em minutos — o clássico brasileiro.",
+    emoji: "🍫",
+    servings: 4,
+    totalMinutes: 15,
+    tags: ["doce", "festa", "clássico"],
+    sourceUrl: "",
+    ingredients: [
+      { id: "b1", name: "Leite condensado", quantity: 1, unit: "lata", emoji: "🥛", aisle: "Laticínios e Ovos" },
+      { id: "b2", name: "Creme de leite", quantity: 1, unit: "caixa", emoji: "🥛", aisle: "Laticínios e Ovos" },
+      { id: "b3", name: "Chocolate em pó", quantity: 4, unit: "colher de sopa", emoji: "🍫", aisle: "Mercearia" },
+      { id: "b4", name: "Manteiga", quantity: 1, unit: "colher de sopa", emoji: "🧈", aisle: "Laticínios e Ovos" },
+      { id: "b5", name: "Granulado", quantity: 3, unit: "colher de sopa", note: "para decorar", emoji: "🎉", aisle: "Mercearia" },
+    ],
+    steps: [
+      "Em uma panela, junte o leite condensado, o creme de leite, o chocolate em pó e a manteiga.",
+      "Leve ao fogo médio, mexendo sem parar com uma colher de pau.",
+      "Cozinhe por cerca de 8 minutos, até engrossar e desgrudar do fundo.",
+      "Transfira para tigelinhas, deixe amornar e cubra com granulado.",
+      "Sirva com colher — quente ou gelado, é uma delícia.",
+    ],
+  },
+  {
+    id: "seed-macarrao",
+    createdAt: Date.now() - 172800000,
+    title: "Macarrão alho e óleo",
+    description: "Simples, aromático e reconfortante. O jantar salvador de qualquer noite.",
+    emoji: "🍝",
+    servings: 2,
+    totalMinutes: 20,
+    tags: ["rápido", "jantar", "vegetariano"],
+    sourceUrl: "",
+    ingredients: [
+      { id: "m1", name: "Espaguete", quantity: 250, unit: "g", emoji: "🍝", aisle: "Mercearia" },
+      { id: "m2", name: "Alho", quantity: 6, unit: "dentes", note: "laminados", emoji: "🧄", aisle: "Hortifrúti" },
+      { id: "m3", name: "Azeite de oliva", quantity: 4, unit: "colher de sopa", emoji: "🫒", aisle: "Mercearia" },
+      { id: "m4", name: "Pimenta calabresa", quantity: 0.5, unit: "colher de chá", emoji: "🌶️", aisle: "Temperos e Condimentos" },
+      { id: "m5", name: "Salsinha", quantity: 2, unit: "colher de sopa", note: "picada", emoji: "🌿", aisle: "Hortifrúti" },
+      { id: "m6", name: "Sal", quantity: 1, unit: "colher de chá", emoji: "🧂", aisle: "Temperos e Condimentos" },
+      { id: "m7", name: "Queijo parmesão", quantity: 30, unit: "g", note: "ralado, opcional", emoji: "🧀", aisle: "Laticínios e Ovos" },
+    ],
+    steps: [
+      "Cozinhe o espaguete em água fervente com sal até ficar al dente. Reserve meia xícara da água do cozimento.",
+      "Enquanto isso, aqueça o azeite em uma frigideira grande em fogo baixo.",
+      "Adicione o alho laminado e a pimenta calabresa. Doure lentamente sem queimar — o alho deve ficar dourado, não escuro.",
+      "Escorra o macarrão e transfira para a frigideira. Misture bem com o azeite temperado.",
+      "Se precisar, adicione um pouco da água do cozimento para criar um molho aveludado.",
+      "Finalize com salsinha picada e parmesão a gosto. Sirva imediatamente.",
+    ],
+  },
+];
