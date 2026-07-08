@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceitaIdRouteImport } from './routes/receita.$id'
 import { Route as ExplorarIdRouteImport } from './routes/explorar.$id'
 import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
+import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
 import { Route as ReceitaIdCozinharRouteImport } from './routes/receita.$id.cozinhar'
 
@@ -54,6 +55,11 @@ const ApiExtractRecipeVideoRoute = ApiExtractRecipeVideoRouteImport.update({
   path: '/api/extract-recipe-video',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiExtractRecipeUrlRoute = ApiExtractRecipeUrlRouteImport.update({
+  id: '/api/extract-recipe-url',
+  path: '/api/extract-recipe-url',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiExtractRecipeRoute = ApiExtractRecipeRouteImport.update({
   id: '/api/extract-recipe',
   path: '/api/extract-recipe',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/explorar': typeof ExplorarRouteWithChildren
   '/importar': typeof ImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/explorar/$id': typeof ExplorarIdRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/explorar': typeof ExplorarRouteWithChildren
   '/importar': typeof ImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/explorar/$id': typeof ExplorarIdRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/explorar': typeof ExplorarRouteWithChildren
   '/importar': typeof ImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
+  '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/explorar/$id': typeof ExplorarIdRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/explorar'
     | '/importar'
     | '/api/extract-recipe'
+    | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/explorar/$id'
     | '/receita/$id'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/explorar'
     | '/importar'
     | '/api/extract-recipe'
+    | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/explorar/$id'
     | '/receita/$id'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/explorar'
     | '/importar'
     | '/api/extract-recipe'
+    | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/explorar/$id'
     | '/receita/$id'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   ExplorarRoute: typeof ExplorarRouteWithChildren
   ImportarRoute: typeof ImportarRoute
   ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
+  ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
   ReceitaIdRoute: typeof ReceitaIdRouteWithChildren
 }
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExtractRecipeVideoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/extract-recipe-url': {
+      id: '/api/extract-recipe-url'
+      path: '/api/extract-recipe-url'
+      fullPath: '/api/extract-recipe-url'
+      preLoaderRoute: typeof ApiExtractRecipeUrlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/extract-recipe': {
       id: '/api/extract-recipe'
       path: '/api/extract-recipe'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExplorarRoute: ExplorarRouteWithChildren,
   ImportarRoute: ImportarRoute,
   ApiExtractRecipeRoute: ApiExtractRecipeRoute,
+  ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
   ReceitaIdRoute: ReceitaIdRouteWithChildren,
 }
