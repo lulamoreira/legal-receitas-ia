@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Sparkles, Loader2, Check, X, Upload, FileVideo, Type as TypeIcon } from "lucide-react";
+import { Sparkles, Loader2, Check, X, Upload, FileVideo, Type as TypeIcon, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import type { ExtractedRecipe } from "@/lib/types";
@@ -27,7 +27,45 @@ function Importar() {
   const [uploadPct, setUploadPct] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkLoading, setLinkLoading] = useState(false);
+
   const [preview, setPreview] = useState<ExtractedRecipe | null>(null);
+
+  async function extractFromLink() {
+    const trimmed = linkUrl.trim();
+    if (!trimmed) {
+      toast.error("Cole o link da receita primeiro.");
+      return;
+    }
+    try {
+      const u = new URL(trimmed);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error();
+    } catch {
+      toast.error("Link inválido. Use um endereço http(s) completo.");
+      return;
+    }
+    setLinkLoading(true);
+    setPreview(null);
+    try {
+      const res = await fetch("/api/extract-recipe-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 429) throw new Error("Muitas requisições. Tente novamente em instantes.");
+        if (res.status === 402) throw new Error("Créditos de IA esgotados.");
+        throw new Error(data?.error || "Não consegui extrair essa receita.");
+      }
+      setPreview({ ...data, sourceUrl: trimmed });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro inesperado.");
+    } finally {
+      setLinkLoading(false);
+    }
+  }
 
   async function extractFromText() {
     if (!caption.trim()) {
@@ -140,7 +178,7 @@ function Importar() {
         <PreviewCard preview={preview} onDiscard={() => setPreview(null)} onSave={save} />
       ) : (
         <Tabs defaultValue="text" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 rounded-full bg-secondary p-1">
+          <TabsList className="grid w-full grid-cols-3 rounded-full bg-secondary p-1">
             <TabsTrigger value="text" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <TypeIcon className="mr-1.5 h-4 w-4" />
               Colar texto
@@ -148,6 +186,10 @@ function Importar() {
             <TabsTrigger value="video" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <FileVideo className="mr-1.5 h-4 w-4" />
               Enviar vídeo
+            </TabsTrigger>
+            <TabsTrigger value="link" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
+              <Link2 className="mr-1.5 h-4 w-4" />
+              Link do site
             </TabsTrigger>
           </TabsList>
 
