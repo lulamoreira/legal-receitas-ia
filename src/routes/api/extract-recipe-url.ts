@@ -308,22 +308,11 @@ export const Route = createFileRoute("/api/extract-recipe-url")({
             );
           }
 
-          const { createLovableAiGatewayProvider } = await import(
-            "@/lib/ai-gateway.server"
-          );
-          const gateway = createLovableAiGatewayProvider(apiKey);
-          const model = gateway("google/gemini-3-flash-preview");
-
-          const prompt = `Extraia e organize a receita a partir do conteúdo da página a seguir. Texto extraído:\n\n${text}`;
-
           try {
-            const { output } = await generateText({
-              model,
-              system: SYSTEM_PROMPT,
-              prompt,
-              output: Output.object({ schema: recipeSchema }),
-            });
-            const clean = sanitizeExtracted(output);
+            const clean = await extractRecipeFromText(
+              `Extraia e organize a receita a partir do conteúdo da página a seguir. Texto extraído:\n\n${text}`,
+              apiKey,
+            );
             if (
               !clean.title ||
               /não foi possível identificar/i.test(clean.title) ||
@@ -339,21 +328,21 @@ export const Route = createFileRoute("/api/extract-recipe-url")({
             }
             return Response.json({ ...clean, sourceUrl: parsedUrl.toString() });
           } catch (err) {
-            if (NoObjectGeneratedError.isInstance(err)) {
-              return Response.json(
-                { error: "A IA não devolveu uma receita válida. Tente outro link." },
-                { status: 502 },
-              );
+            if (err instanceof RecipeExtractionError) {
+              console.error("[extract-recipe-url]", err.code, err.message, err.detail);
+              const message =
+                err.code === "not_recipe"
+                  ? "Não encontrei uma receita nessa página. Confira se o link abre uma receita completa."
+                  : err.code === "invalid_json" || err.code === "empty" || err.code === "gateway"
+                    ? "A IA não devolveu uma receita válida. Tente outro link."
+                    : err.message;
+              return Response.json({ error: message }, { status: err.status });
             }
             const msg = err instanceof Error ? err.message : String(err);
-            const status = /429|rate/i.test(msg)
-              ? 429
-              : /402|credit/i.test(msg)
-                ? 402
-                : 500;
             console.error("[extract-recipe-url]", msg);
-            return Response.json({ error: msg }, { status });
+            return Response.json({ error: msg }, { status: 500 });
           }
+
         } catch (e) {
           console.error(e);
           return Response.json({ error: "Erro no servidor." }, { status: 500 });
