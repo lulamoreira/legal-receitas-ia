@@ -19,7 +19,6 @@ import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-
 import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
 import { Route as ReceitaIdCozinharRouteImport } from './routes/receita.$id.cozinhar'
-import { Route as ApiPublicBackfillImagesRouteImport } from './routes/api/public/backfill-images'
 
 const ImportarRoute = ImportarRouteImport.update({
   id: '/importar',
@@ -71,11 +70,6 @@ const ReceitaIdCozinharRoute = ReceitaIdCozinharRouteImport.update({
   path: '/cozinhar',
   getParentRoute: () => ReceitaIdRoute,
 } as any)
-const ApiPublicBackfillImagesRoute = ApiPublicBackfillImagesRouteImport.update({
-  id: '/api/public/backfill-images',
-  path: '/api/public/backfill-images',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,7 +81,6 @@ export interface FileRoutesByFullPath {
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/explorar/$id': typeof ExplorarIdRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
-  '/api/public/backfill-images': typeof ApiPublicBackfillImagesRoute
   '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
 export interface FileRoutesByTo {
@@ -100,7 +93,6 @@ export interface FileRoutesByTo {
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/explorar/$id': typeof ExplorarIdRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
-  '/api/public/backfill-images': typeof ApiPublicBackfillImagesRoute
   '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
 export interface FileRoutesById {
@@ -114,7 +106,6 @@ export interface FileRoutesById {
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/explorar/$id': typeof ExplorarIdRoute
   '/receita/$id': typeof ReceitaIdRouteWithChildren
-  '/api/public/backfill-images': typeof ApiPublicBackfillImagesRoute
   '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
 }
 export interface FileRouteTypes {
@@ -129,7 +120,6 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-video'
     | '/explorar/$id'
     | '/receita/$id'
-    | '/api/public/backfill-images'
     | '/receita/$id/cozinhar'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -142,7 +132,6 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-video'
     | '/explorar/$id'
     | '/receita/$id'
-    | '/api/public/backfill-images'
     | '/receita/$id/cozinhar'
   id:
     | '__root__'
@@ -155,7 +144,6 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-video'
     | '/explorar/$id'
     | '/receita/$id'
-    | '/api/public/backfill-images'
     | '/receita/$id/cozinhar'
   fileRoutesById: FileRoutesById
 }
@@ -168,7 +156,6 @@ export interface RootRouteChildren {
   ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
   ReceitaIdRoute: typeof ReceitaIdRouteWithChildren
-  ApiPublicBackfillImagesRoute: typeof ApiPublicBackfillImagesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -243,13 +230,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReceitaIdCozinharRouteImport
       parentRoute: typeof ReceitaIdRoute
     }
-    '/api/public/backfill-images': {
-      id: '/api/public/backfill-images'
-      path: '/api/public/backfill-images'
-      fullPath: '/api/public/backfill-images'
-      preLoaderRoute: typeof ApiPublicBackfillImagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -286,7 +266,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
   ReceitaIdRoute: ReceitaIdRouteWithChildren,
-  ApiPublicBackfillImagesRoute: ApiPublicBackfillImagesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
