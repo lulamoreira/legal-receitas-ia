@@ -90,11 +90,14 @@ function CookMode() {
         </p>
 
         <div className="flex flex-1 items-center">
-          <div className="w-full rounded-3xl bg-card p-8 shadow-[var(--shadow-warm)]">
+          <div
+            className="w-full rounded-3xl border-2 bg-card p-8 shadow-[var(--shadow-warm)]"
+            style={{ borderColor: "#F6D9E3" }}
+          >
             <div className="mb-5 grid h-14 w-14 place-items-center rounded-full bg-primary font-serif text-2xl font-bold text-primary-foreground">
               {step + 1}
             </div>
-            <p className="font-serif text-2xl leading-snug text-foreground">
+            <p className="font-serif text-2xl font-semibold leading-snug text-foreground">
               {recipe.steps[step]}
             </p>
           </div>

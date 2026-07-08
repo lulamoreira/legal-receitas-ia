@@ -74,30 +74,49 @@ function RecipeDetail() {
       </div>
 
       <div className="mb-5 flex items-start gap-4">
-        <div className="grid h-24 w-24 shrink-0 place-items-center rounded-3xl bg-accent text-6xl shadow-[var(--shadow-soft)]" aria-hidden>
+        <div
+          className="grid h-24 w-24 shrink-0 place-items-center rounded-3xl text-6xl shadow-[var(--shadow-soft)]"
+          style={{ backgroundColor: "#FFE3EC" }}
+          aria-hidden
+        >
           {recipe.emoji}
         </div>
         <div className="min-w-0 pt-1">
-          <h1 className="font-serif text-2xl leading-tight text-foreground">{recipe.title}</h1>
+          <h1 className="font-serif text-2xl font-bold leading-tight text-foreground">{recipe.title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{recipe.description}</p>
         </div>
       </div>
 
       <div className="mb-5 flex flex-wrap gap-1.5">
-        <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-foreground">
+        <span
+          className="rounded-full px-2.5 py-1 text-xs font-semibold"
+          style={{ backgroundColor: "#FFF0C7", color: "#6B4A06" }}
+        >
           ⏱ {recipe.totalMinutes} min
         </span>
-        {recipe.tags.map((t) => (
-          <span key={t} className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-            {t}
-          </span>
-        ))}
+        {recipe.tags.map((t, i) => {
+          const p = [
+            { bg: "#FFE3EC", fg: "#7B2547" },
+            { bg: "#DFF5E9", fg: "#14532D" },
+            { bg: "#EDE7FB", fg: "#3B2E6B" },
+            { bg: "#FFF0C7", fg: "#6B4A06" },
+          ][i % 4]!;
+          return (
+            <span
+              key={t}
+              className="rounded-full px-2.5 py-1 text-xs font-semibold"
+              style={{ backgroundColor: p.bg, color: p.fg }}
+            >
+              {t}
+            </span>
+          );
+        })}
         {recipe.sourceUrl && (
           <a
             href={recipe.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent"
+            className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-secondary-foreground hover:bg-accent"
           >
             <ExternalLink className="h-3 w-3" />
             Post original

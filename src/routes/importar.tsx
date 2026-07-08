@@ -141,11 +141,11 @@ function Importar() {
       ) : (
         <Tabs defaultValue="text" className="w-full">
           <TabsList className="grid w-full grid-cols-2 rounded-full bg-secondary p-1">
-            <TabsTrigger value="text" className="rounded-full data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
+            <TabsTrigger value="text" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <TypeIcon className="mr-1.5 h-4 w-4" />
               Colar texto
             </TabsTrigger>
-            <TabsTrigger value="video" className="rounded-full data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
+            <TabsTrigger value="video" className="rounded-full font-semibold data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <FileVideo className="mr-1.5 h-4 w-4" />
               Enviar vídeo
             </TabsTrigger>
@@ -207,13 +207,14 @@ function Importar() {
               {!videoFile ? (
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border bg-card p-8 text-center transition hover:border-primary hover:bg-accent/40"
+                  className="flex w-full flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed bg-card p-8 text-center transition hover:bg-accent/40"
+                  style={{ borderColor: "#F6D9E3" }}
                 >
-                  <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary">
+                  <div className="grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-soft)]">
                     <Upload className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Escolher vídeo do celular</p>
+                    <p className="font-serif text-base font-bold text-foreground">Escolher vídeo do celular</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       MP4 até ~90 segundos · máx. 25MB
                     </p>
