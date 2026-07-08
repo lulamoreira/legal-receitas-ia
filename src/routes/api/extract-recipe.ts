@@ -1,52 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateText, Output, NoObjectGeneratedError } from "ai";
 import { z } from "zod";
-import { AISLES } from "@/lib/types";
-
-const aisleEnum = z.enum(AISLES);
-
-const ingredientSchema = z.object({
-  name: z.string(),
-  quantity: z.number(),
-  unit: z.string(),
-  note: z.string().optional(),
-  emoji: z.string(),
-  aisle: aisleEnum,
-});
-
-const recipeSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  emoji: z.string(),
-  servings: z.number(),
-  totalMinutes: z.number(),
-  tags: z.array(z.string()),
-  ingredients: z.array(ingredientSchema),
-  steps: z.array(z.string()),
-});
-
-const SYSTEM_PROMPT = `Você é um chef assistente que organiza receitas caóticas de redes sociais em receitas estruturadas em português do Brasil.
-
-Regras obrigatórias:
-- SEMPRE responda em português do Brasil, mesmo se o texto original estiver em inglês ou outro idioma.
-- Ignore completamente hashtags (#), menções (@), autopromoção ("me segue", "link na bio", "curta", "salva esse post"), pedidos de engajamento e emojis decorativos que não sejam do prato.
-- Converta frações em decimais: 1/2 = 0.5, 1/4 = 0.25, 1/3 ≈ 0.33, 3/4 = 0.75.
-- Converta medidas americanas para as brasileiras:
-  * cup / xícara americana → "xícara"
-  * tbsp / tablespoon → "colher de sopa"
-  * tsp / teaspoon → "colher de chá"
-  * oz → aproxime para "g" quando for ingrediente seco/sólido
-  * lb → "kg" ou "g"
-  * fahrenheit em passos → converta para celsius
-- Escolha UM emoji que represente o prato final (ex: 🍝, 🍰, 🥗, 🍲).
-- Para CADA ingrediente escolha um emoji apropriado e classifique em UMA destas categorias (use exatamente esta grafia):
-  Hortifrúti, Açougue e Peixaria, Laticínios e Ovos, Padaria, Mercearia, Congelados, Bebidas, Temperos e Condimentos, Outros.
-- Gere 2 a 4 tags curtas em minúsculas (ex: "rápido", "vegetariano", "sobremesa", "jantar").
-- description: uma frase curta e apetitosa (máx ~120 caracteres).
-- totalMinutes: número inteiro em minutos.
-- servings: número inteiro de porções (assuma 4 se não informado).
-- steps: passos numerados claros, sem repetir "Passo 1:" no texto.
-- Se o texto claramente não for uma receita, retorne uma receita mínima com título "Não foi possível identificar uma receita" e listas vazias.`;
+import {
+  SYSTEM_PROMPT,
+  recipeSchema,
+  sanitizeExtracted,
+} from "@/lib/recipe-extraction.server";
 
 export const Route = createFileRoute("/api/extract-recipe")({
   server: {
@@ -82,20 +41,7 @@ export const Route = createFileRoute("/api/extract-recipe")({
               prompt,
               output: Output.object({ schema: recipeSchema }),
             });
-
-            // Clamp/sanitize
-            const clean = {
-              ...output,
-              servings: Math.max(1, Math.min(50, Math.round(output.servings || 4))),
-              totalMinutes: Math.max(1, Math.min(1440, Math.round(output.totalMinutes || 30))),
-              tags: (output.tags || []).slice(0, 4),
-              ingredients: (output.ingredients || []).map((i: z.infer<typeof ingredientSchema>) => ({
-                ...i,
-                quantity: Number.isFinite(i.quantity) ? Math.max(0, i.quantity) : 0,
-              })),
-            };
-
-            return Response.json(clean);
+            return Response.json(sanitizeExtracted(output));
           } catch (err) {
             if (NoObjectGeneratedError.isInstance(err)) {
               return Response.json(
