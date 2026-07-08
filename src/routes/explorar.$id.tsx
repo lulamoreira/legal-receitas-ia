@@ -51,7 +51,7 @@ function CatalogRecipeDetail() {
         servings: recipe.servings,
         totalMinutes: recipe.totalMinutes,
         tags: recipe.tags,
-        ingredients: recipe.ingredients.map(({ id: _id, ...rest }) => rest),
+        ingredients: recipe.ingredients,
         steps: recipe.steps,
       });
       toast.success("Receita salva nas suas receitas!");
