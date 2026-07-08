@@ -80,3 +80,114 @@ export function sanitizeExtracted(output: z.infer<typeof recipeSchema>) {
     })),
   };
 }
+
+export const AI_MODEL = "google/gemini-2.5-flash";
+
+function extractJson(s: string): string {
+  const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) return fence[1].trim();
+  const first = s.indexOf("{");
+  const last = s.lastIndexOf("}");
+  if (first >= 0 && last > first) return s.slice(first, last + 1);
+  return s.trim();
+}
+
+export type ExtractError = {
+  code: "rate_limit" | "credits" | "gateway" | "empty" | "invalid_json" | "not_recipe";
+  message: string;
+  status: number;
+  detail?: unknown;
+};
+
+export class RecipeExtractionError extends Error {
+  code: ExtractError["code"];
+  status: number;
+  detail?: unknown;
+  constructor(e: ExtractError) {
+    super(e.message);
+    this.code = e.code;
+    this.status = e.status;
+    this.detail = e.detail;
+  }
+}
+
+export async function extractRecipeFromText(text: string, apiKey: string) {
+  const gatewayRes = await fetch(
+    "https://ai.gateway.lovable.dev/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Lovable-API-Key": apiKey,
+        "X-Lovable-AIG-SDK": "raw",
+      },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: `${SYSTEM_PROMPT}\n\n${JSON_INSTRUCTION}` },
+          { role: "user", content: text },
+        ],
+      }),
+    },
+  );
+
+  if (!gatewayRes.ok) {
+    const txt = await gatewayRes.text().catch(() => "");
+    console.error("[extractRecipeFromText] gateway", gatewayRes.status, txt);
+    if (gatewayRes.status === 429)
+      throw new RecipeExtractionError({
+        code: "rate_limit",
+        message: "Muitas requisições. Tente novamente em instantes.",
+        status: 429,
+      });
+    if (gatewayRes.status === 402)
+      throw new RecipeExtractionError({
+        code: "credits",
+        message: "Créditos de IA esgotados.",
+        status: 402,
+      });
+    throw new RecipeExtractionError({
+      code: "gateway",
+      message: "A IA não conseguiu processar a receita.",
+      status: 502,
+      detail: txt,
+    });
+  }
+
+  const payload = await gatewayRes.json();
+  const content: string | undefined = payload?.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new RecipeExtractionError({
+      code: "empty",
+      message: "Resposta vazia da IA.",
+      status: 502,
+    });
+  }
+
+  const jsonText = extractJson(content);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch {
+    console.error("[extractRecipeFromText] invalid JSON", content.slice(0, 500));
+    throw new RecipeExtractionError({
+      code: "invalid_json",
+      message: "A IA não devolveu um JSON válido. Tente novamente.",
+      status: 502,
+    });
+  }
+
+  const validated = recipeSchema.safeParse(parsed);
+  if (!validated.success) {
+    console.error("[extractRecipeFromText] schema fail", validated.error.issues);
+    throw new RecipeExtractionError({
+      code: "not_recipe",
+      message: "Não consegui identificar uma receita.",
+      status: 422,
+    });
+  }
+
+  return sanitizeExtracted(validated.data);
+}
+
