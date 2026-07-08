@@ -67,8 +67,8 @@ function Index() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          {filtered.map((r) => (
-            <RecipeCard key={r.id} recipe={r} />
+          {filtered.map((r, i) => (
+            <RecipeCard key={r.id} recipe={r} index={i} />
           ))}
         </div>
       )}
