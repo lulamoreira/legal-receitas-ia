@@ -1,9 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { BookOpen, Sparkles, ShoppingCart } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 export function BottomNav() {
-  const pending = useStore((s) => s.shoppingList.filter((i) => !i.checked).length);
+  const hydrated = useHydrated();
+  const pending = useStore((s) =>
+    hydrated ? s.shoppingList.filter((i) => !i.checked).length : 0,
+  );
 
   const item = "flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs font-medium text-muted-foreground transition-colors data-[status=active]:text-primary";
 

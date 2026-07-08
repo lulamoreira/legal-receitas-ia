@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Check, Trash2 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { AISLES, type Aisle } from "@/lib/types";
 import { formatQuantity } from "@/lib/format";
 
@@ -10,9 +11,18 @@ export const Route = createFileRoute("/compras")({
 });
 
 function Compras() {
+  const hydrated = useHydrated();
   const list = useStore((s) => s.shoppingList);
   const toggle = useStore((s) => s.toggleItem);
   const clear = useStore((s) => s.clearChecked);
+
+  if (!hydrated) {
+    return (
+      <div className="px-4 pt-16 text-center text-sm text-muted-foreground">
+        Carregando…
+      </div>
+    );
+  }
 
   const grouped = useMemo(() => {
     const g = new Map<Aisle, typeof list>();
