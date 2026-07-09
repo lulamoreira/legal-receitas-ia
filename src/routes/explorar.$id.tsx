@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, BookmarkPlus, ChefHat } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, ChefHat, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { fetchCatalogRecipe } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
@@ -61,131 +61,147 @@ function CatalogRecipeDetail() {
     }
   }
 
-  return (
-    <div className="px-4 pt-6 pb-6">
-      <div className="mb-4">
-        <Link
-          to="/explorar"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-sm"
-          aria-label="Voltar"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-      </div>
+  if (status === "loading") {
+    return (
+      <div className="px-4 pt-16 text-center text-sm text-muted-foreground">Carregando receita…</div>
+    );
+  }
 
-      {status === "loading" && (
-        <div className="rounded-2xl bg-card p-8 text-center text-sm text-muted-foreground shadow-[var(--shadow-soft)]">
-          Carregando receita…
-        </div>
-      )}
-
-      {status === "not-found" && (
-        <div className="rounded-2xl bg-card p-8 text-center shadow-[var(--shadow-soft)]">
+  if (status === "not-found") {
+    return (
+      <div className="px-4 pt-16">
+        <div className="rounded-3xl bg-card p-8 text-center shadow-[var(--shadow-soft)]">
           <div className="mb-2 text-4xl" aria-hidden>🔍</div>
           <p className="text-sm text-muted-foreground">Essa receita não está mais no catálogo.</p>
+          <Link to="/explorar" className="mt-4 inline-block rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
+            Voltar ao catálogo
+          </Link>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {status === "error" && (
-        <div className="rounded-2xl bg-card p-8 text-center shadow-[var(--shadow-soft)]">
+  if (status === "error") {
+    return (
+      <div className="px-4 pt-16">
+        <div className="rounded-3xl bg-card p-8 text-center shadow-[var(--shadow-soft)]">
           <div className="mb-2 text-4xl" aria-hidden>😕</div>
           <p className="text-sm text-muted-foreground">Não consegui carregar essa receita. Tente de novo.</p>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {status === "ready" && recipe && (
-        <>
-          <div className="mb-5 flex items-start gap-4">
-            <div
-              className="grid h-24 w-24 shrink-0 place-items-center rounded-3xl text-6xl shadow-[var(--shadow-soft)]"
-              style={{ backgroundColor: "#FFE3EC" }}
-              aria-hidden
-            >
-              {recipe.emoji}
-            </div>
-            <div className="min-w-0 pt-1">
-              <h1 className="font-serif text-2xl font-bold leading-tight text-foreground">{recipe.title}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">{recipe.description}</p>
-            </div>
-          </div>
+  if (!recipe) return null;
+  const hasImage = Boolean(recipe.imageUrl);
 
-          <div className="mb-5 flex flex-wrap gap-1.5">
-            <span
-              className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "#FFF0C7", color: "#6B4A06" }}
-            >
-              ⏱ {recipe.totalMinutes} min
-            </span>
-            <span
-              className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "#DFF5E9", color: "#14532D" }}
-            >
-              🍽 {recipe.servings} porções
-            </span>
-            {recipe.tags.map((t, i) => {
-              const p = [
-                { bg: "#FFE3EC", fg: "#7B2547" },
-                { bg: "#EDE7FB", fg: "#3B2E6B" },
-                { bg: "#FFF0C7", fg: "#6B4A06" },
-                { bg: "#DFF5E9", fg: "#14532D" },
-              ][i % 4]!;
-              return (
-                <span
-                  key={t}
-                  className="rounded-full px-2.5 py-1 text-xs font-semibold"
-                  style={{ backgroundColor: p.bg, color: p.fg }}
-                >
-                  {t}
-                </span>
-              );
-            })}
-          </div>
-
-          <button
-            onClick={handleSave}
-            disabled={saving || !hydrated}
-            className="mb-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+  return (
+    <div className="pb-6">
+      <div className="relative">
+        <div
+          className="relative overflow-hidden"
+          style={{ borderBottomLeftRadius: "2rem", borderBottomRightRadius: "2rem" }}
+        >
+          <div
+            className="aspect-[4/3] w-full"
+            style={{ backgroundColor: hasImage ? "transparent" : "#FFE3EC" }}
           >
-            <BookmarkPlus className="h-4 w-4" />
-            {saving ? "Salvando…" : "Salvar nas minhas receitas"}
-          </button>
+            {hasImage ? (
+              <img src={recipe.imageUrl} alt={recipe.title} className="h-full w-full object-cover" />
+            ) : (
+              <div className="grid h-full place-items-center text-[7rem]" aria-hidden>
+                {recipe.emoji}
+              </div>
+            )}
+          </div>
+          {hasImage && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
+          )}
+        </div>
 
-          <section className="mb-6 rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
-            <h2 className="mb-3 font-serif text-lg text-foreground">Ingredientes</h2>
-            <ul className="space-y-2">
-              {recipe.ingredients.map((ing) => (
-                <li key={ing.id} className="flex items-start gap-2 text-sm text-foreground">
-                  <span aria-hidden>{ing.emoji}</span>
-                  <span className="flex-1">
-                    <span className="font-medium">
-                      {ing.quantity} {ing.unit}
-                    </span>{" "}
-                    {ing.name}
-                    {ing.note ? <span className="text-muted-foreground"> ({ing.note})</span> : null}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <div className="absolute inset-x-0 top-0 flex items-center px-4 pt-4">
+          <Link
+            to="/explorar"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-foreground shadow-md backdrop-blur transition hover:bg-card"
+            aria-label="Voltar"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+        </div>
+      </div>
 
-          <section className="rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)]">
-            <h2 className="mb-3 flex items-center gap-2 font-serif text-lg text-foreground">
-              <ChefHat className="h-4 w-4" />
-              Modo de preparo
-            </h2>
-            <ol className="space-y-3">
-              {recipe.steps.map((s, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary font-serif text-sm font-bold text-primary-foreground">
-                    {i + 1}
-                  </span>
-                  <p className="pt-0.5 text-sm leading-relaxed text-foreground">{s}</p>
-                </li>
-              ))}
-            </ol>
-          </section>
-        </>
-      )}
+      <div className="px-4 pt-5">
+        <h1 className="font-serif text-[26px] font-bold leading-tight text-foreground">{recipe.title}</h1>
+        {recipe.description && (
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{recipe.description}</p>
+        )}
+
+        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold" style={{ backgroundColor: "#FFF0C7", color: "#6B4A06" }}>
+            <Clock className="h-3.5 w-3.5" />
+            {recipe.totalMinutes} min
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold" style={{ backgroundColor: "#DFF5E9", color: "#14532D" }}>
+            <Users className="h-3.5 w-3.5" />
+            {recipe.servings} porções
+          </span>
+          {recipe.tags.map((t, i) => {
+            const p = [
+              { bg: "#FFE3EC", fg: "#7B2547" },
+              { bg: "#EDE7FB", fg: "#3B2E6B" },
+            ][i % 2]!;
+            return (
+              <span key={t} className="rounded-full px-3 py-1.5 font-semibold" style={{ backgroundColor: p.bg, color: p.fg }}>
+                {t}
+              </span>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={saving || !hydrated}
+          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90 disabled:opacity-60 active:scale-[0.99]"
+        >
+          <BookmarkPlus className="h-4 w-4" />
+          {saving ? "Salvando…" : "Salvar nas minhas receitas"}
+        </button>
+
+        <section className="mt-6 rounded-3xl bg-card p-5 shadow-[var(--shadow-soft)]">
+          <h2 className="mb-3 font-serif text-lg text-foreground">Ingredientes</h2>
+          <ul className="space-y-2.5">
+            {recipe.ingredients.map((ing) => (
+              <li key={ing.id} className="flex items-start gap-2.5 text-sm text-foreground">
+                <span className="text-base" aria-hidden>{ing.emoji}</span>
+                <span className="flex-1 leading-relaxed">
+                  <span className="font-semibold">
+                    {ing.quantity} {ing.unit}
+                  </span>{" "}
+                  {ing.name}
+                  {ing.note ? <span className="text-muted-foreground"> ({ing.note})</span> : null}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="mt-4 rounded-3xl bg-card p-5 shadow-[var(--shadow-soft)]">
+          <h2 className="mb-4 flex items-center gap-2 font-serif text-lg text-foreground">
+            <ChefHat className="h-4 w-4" />
+            Modo de preparo
+          </h2>
+          <ol className="space-y-4">
+            {recipe.steps.map((s, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 font-serif text-sm font-bold text-primary">
+                  {i + 1}
+                </span>
+                <p className="pt-1 text-sm leading-relaxed text-foreground">{s}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
     </div>
   );
 }
