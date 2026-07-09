@@ -42,19 +42,24 @@ function AuthenticatedLayout() {
       try {
         const parsed = JSON.parse(raw);
         const state = parsed?.state ?? parsed;
-        const recipes: Recipe[] = Array.isArray(state?.recipes) ? state.recipes : [];
+        const rawRecipes: Recipe[] = Array.isArray(state?.recipes) ? state.recipes : [];
         const shoppingList: ShoppingItem[] = Array.isArray(state?.shoppingList)
           ? state.shoppingList
           : [];
 
-        // Filter out the seeded ones by shape: only migrate if the user has clearly
-        // added content beyond the initial 2 seed recipes.
+        // Drop seeded example recipes — they aren't user content.
+        const recipes = rawRecipes.filter(
+          (r) => typeof r?.id !== "string" || !r.id.startsWith("seed-"),
+        );
+
+        // Nothing worth migrating: just clear the legacy blob.
         if (recipes.length === 0 && shoppingList.length === 0) {
           window.localStorage.removeItem(LEGACY_STORAGE_KEY);
           return;
         }
 
         const result = await importLocalData({ recipes, shoppingList });
+        // Only clear legacy data AFTER a successful migration.
         window.localStorage.removeItem(LEGACY_STORAGE_KEY);
         // Refresh from server after import
         await hydrate();
@@ -67,6 +72,9 @@ function AuthenticatedLayout() {
         }
       } catch (e) {
         console.error("[legacy migration]", e);
+        toast.error(
+          "Não consegui migrar suas receitas antigas agora. Vamos tentar de novo na próxima vez que você abrir o app.",
+        );
       }
     })();
   }, [hydrate, importLocalData]);
