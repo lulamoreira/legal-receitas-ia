@@ -116,31 +116,27 @@ export const useStore = create<State>()((set, get) => ({
   importLocalData: async ({ recipes, shoppingList }) => {
     let insertedRecipes = 0;
     let insertedItems = 0;
-    try {
-      if (recipes.length > 0) {
-        const res = await bulkImportUserRecipes({
-          data: { recipes: recipes as any },
-        });
-        insertedRecipes = res.inserted;
-      }
-      if (shoppingList.length > 0) {
-        const res = await bulkImportShoppingItems({
-          data: {
-            items: shoppingList.map((i) => ({
-              recipeTitle: i.recipeTitle,
-              name: i.name,
-              quantity: i.quantity,
-              unit: i.unit,
-              emoji: i.emoji,
-              aisle: i.aisle,
-              checked: i.checked,
-            })),
-          },
-        });
-        insertedItems = res.inserted;
-      }
-    } catch (e) {
-      console.error("[importLocalData]", e);
+    if (recipes.length > 0) {
+      const res = await bulkImportUserRecipes({
+        data: { recipes: recipes as any },
+      });
+      insertedRecipes = res.inserted;
+    }
+    if (shoppingList.length > 0) {
+      const res = await bulkImportShoppingItems({
+        data: {
+          items: shoppingList.map((i) => ({
+            recipeTitle: i.recipeTitle,
+            name: i.name,
+            quantity: i.quantity,
+            unit: i.unit,
+            emoji: i.emoji,
+            aisle: i.aisle,
+            checked: i.checked,
+          })),
+        },
+      });
+      insertedItems = res.inserted;
     }
     return { recipes: insertedRecipes, items: insertedItems };
   },
