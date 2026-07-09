@@ -88,7 +88,7 @@ function parseTudoGostoso(html: string, ingredient: string): Result[] {
   const base = "https://www.tudogostoso.com.br";
   const out: Result[] = [];
   const seen = new Set<string>();
-  const anchorRe = /<a\b[^>]*href=["']([^"']*\/receitas\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  const anchorRe = /<a\b[^>]*href=["']([^"']*\/receita\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let m: RegExpExecArray | null;
   while ((m = anchorRe.exec(html))) {
     const href = m[1];
