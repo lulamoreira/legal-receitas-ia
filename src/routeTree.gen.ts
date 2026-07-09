@@ -12,11 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as ApiSuggestDishesRouteImport } from './routes/api/suggest-dishes'
 import { Route as ApiSearchRecipesByIngredientRouteImport } from './routes/api/search-recipes-by-ingredient'
 import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
 import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
+import { Route as ApiDishDetailsRouteImport } from './routes/api/dish-details'
 import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
+import { Route as AuthenticatedHojeRouteImport } from './routes/_authenticated/hoje'
 import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticated/explorar'
 import { Route as AuthenticatedComprasRouteImport } from './routes/_authenticated/compras'
 import { Route as AuthenticatedReceitaIdRouteImport } from './routes/_authenticated/receita.$id'
@@ -37,6 +40,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiSuggestDishesRoute = ApiSuggestDishesRouteImport.update({
+  id: '/api/suggest-dishes',
+  path: '/api/suggest-dishes',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSearchRecipesByIngredientRoute =
   ApiSearchRecipesByIngredientRouteImport.update({
@@ -59,9 +67,19 @@ const ApiExtractRecipeRoute = ApiExtractRecipeRouteImport.update({
   path: '/api/extract-recipe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDishDetailsRoute = ApiDishDetailsRouteImport.update({
+  id: '/api/dish-details',
+  path: '/api/dish-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedImportarRoute = AuthenticatedImportarRouteImport.update({
   id: '/importar',
   path: '/importar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHojeRoute = AuthenticatedHojeRouteImport.update({
+  id: '/hoje',
+  path: '/hoje',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedExplorarRoute = AuthenticatedExplorarRouteImport.update({
@@ -102,11 +120,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compras': typeof AuthenticatedComprasRoute
   '/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/hoje': typeof AuthenticatedHojeRoute
   '/importar': typeof AuthenticatedImportarRoute
+  '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/api/suggest-dishes': typeof ApiSuggestDishesRoute
   '/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
@@ -116,11 +137,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/compras': typeof AuthenticatedComprasRoute
   '/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/hoje': typeof AuthenticatedHojeRoute
   '/importar': typeof AuthenticatedImportarRoute
+  '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/api/suggest-dishes': typeof ApiSuggestDishesRoute
   '/': typeof AuthenticatedIndexRoute
   '/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
@@ -133,11 +157,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/compras': typeof AuthenticatedComprasRoute
   '/_authenticated/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/_authenticated/hoje': typeof AuthenticatedHojeRoute
   '/_authenticated/importar': typeof AuthenticatedImportarRoute
+  '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/api/suggest-dishes': typeof ApiSuggestDishesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/_authenticated/explorar/$id': typeof AuthenticatedExplorarIdRoute
@@ -151,11 +178,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compras'
     | '/explorar'
+    | '/hoje'
     | '/importar'
+    | '/api/dish-details'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/api/suggest-dishes'
     | '/categoria/$slug'
     | '/explorar/$id'
     | '/receita/$id'
@@ -165,11 +195,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compras'
     | '/explorar'
+    | '/hoje'
     | '/importar'
+    | '/api/dish-details'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/api/suggest-dishes'
     | '/'
     | '/categoria/$slug'
     | '/explorar/$id'
@@ -181,11 +214,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/compras'
     | '/_authenticated/explorar'
+    | '/_authenticated/hoje'
     | '/_authenticated/importar'
+    | '/api/dish-details'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/api/suggest-dishes'
     | '/_authenticated/'
     | '/_authenticated/categoria/$slug'
     | '/_authenticated/explorar/$id'
@@ -196,10 +232,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiDishDetailsRoute: typeof ApiDishDetailsRoute
   ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
   ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
   ApiSearchRecipesByIngredientRoute: typeof ApiSearchRecipesByIngredientRoute
+  ApiSuggestDishesRoute: typeof ApiSuggestDishesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,6 +262,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/suggest-dishes': {
+      id: '/api/suggest-dishes'
+      path: '/api/suggest-dishes'
+      fullPath: '/api/suggest-dishes'
+      preLoaderRoute: typeof ApiSuggestDishesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/search-recipes-by-ingredient': {
       id: '/api/search-recipes-by-ingredient'
@@ -253,11 +298,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExtractRecipeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/dish-details': {
+      id: '/api/dish-details'
+      path: '/api/dish-details'
+      fullPath: '/api/dish-details'
+      preLoaderRoute: typeof ApiDishDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/importar': {
       id: '/_authenticated/importar'
       path: '/importar'
       fullPath: '/importar'
       preLoaderRoute: typeof AuthenticatedImportarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/hoje': {
+      id: '/_authenticated/hoje'
+      path: '/hoje'
+      fullPath: '/hoje'
+      preLoaderRoute: typeof AuthenticatedHojeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/explorar': {
@@ -335,6 +394,7 @@ const AuthenticatedReceitaIdRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedComprasRoute: typeof AuthenticatedComprasRoute
   AuthenticatedExplorarRoute: typeof AuthenticatedExplorarRouteWithChildren
+  AuthenticatedHojeRoute: typeof AuthenticatedHojeRoute
   AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCategoriaSlugRoute: typeof AuthenticatedCategoriaSlugRoute
@@ -344,6 +404,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedComprasRoute: AuthenticatedComprasRoute,
   AuthenticatedExplorarRoute: AuthenticatedExplorarRouteWithChildren,
+  AuthenticatedHojeRoute: AuthenticatedHojeRoute,
   AuthenticatedImportarRoute: AuthenticatedImportarRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCategoriaSlugRoute: AuthenticatedCategoriaSlugRoute,
@@ -356,10 +417,12 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiDishDetailsRoute: ApiDishDetailsRoute,
   ApiExtractRecipeRoute: ApiExtractRecipeRoute,
   ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
   ApiSearchRecipesByIngredientRoute: ApiSearchRecipesByIngredientRoute,
+  ApiSuggestDishesRoute: ApiSuggestDishesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

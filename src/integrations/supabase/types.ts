@@ -205,6 +205,27 @@ export type Database = {
           },
         ]
       }
+      user_taste_profile: {
+        Row: {
+          liked_dishes: Json
+          restrictions: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          liked_dishes?: Json
+          restrictions?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          liked_dishes?: Json
+          restrictions?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
