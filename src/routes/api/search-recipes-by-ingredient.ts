@@ -163,6 +163,7 @@ function parseGuiaDaCozinha(html: string, ingredient: string): Result[] {
       const aria = attrs.match(/aria-label=["']([^"']+)["']/i);
       if (aria) title = aria[1];
     }
+    title = title.replace(/^\s*link\s+on\s+post\s+/i, "").trim();
     if (!title || title.length < 3) continue;
     seen.add(url);
     out.push({ title, url, thumbnailUrl: thumb, source: "Guia da Cozinha" });
