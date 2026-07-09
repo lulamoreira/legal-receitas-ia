@@ -136,8 +136,10 @@ function parseGuiaDaCozinha(html: string, ingredient: string): Result[] {
   const out: Result[] = [];
   const seen = new Set<string>();
   const anchorRe = /<a\b[^>]*href=["']([^"']*guiadacozinha\.com\.br\/receitas\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  let matchCount = 0;
   let m: RegExpExecArray | null;
   while ((m = anchorRe.exec(html))) {
+    matchCount++;
     const href = m[1];
     const inner = m[2];
     const attrs = m[0];
@@ -159,9 +161,13 @@ function parseGuiaDaCozinha(html: string, ingredient: string): Result[] {
     seen.add(url);
     out.push({ title, url, thumbnailUrl: thumb, source: "Guia da Cozinha" });
   }
+  console.error(
+    `[search-recipes] guiadacozinha html=${html.length} bytes, anchor matches=${matchCount}, pre-filter results=${out.length}`,
+  );
   const needle = normalize(ingredient);
   return out.filter((r) => normalize(r.title).includes(needle));
 }
+
 
 export const Route = createFileRoute("/api/search-recipes-by-ingredient")({
   server: {
