@@ -296,7 +296,7 @@ export const Route = createFileRoute("/api/extract-recipe-url")({
             return Response.json(
               {
                 error:
-                  "Não consegui ler o conteúdo dessa página (talvez ela carregue por JavaScript). Copie o texto da receita e use a aba Colar texto.",
+                  "Nesse link não tem nenhuma receita legível — talvez o site carregue por JavaScript. Copie o texto da receita e cole na aba Colar texto.",
               },
               { status: 422 },
             );
@@ -323,7 +323,7 @@ export const Route = createFileRoute("/api/extract-recipe-url")({
               return Response.json(
                 {
                   error:
-                    "Não encontrei uma receita nessa página. Confira se o link abre uma receita completa.",
+                    "Nesse link não tem nenhuma receita. Manda outro?",
                 },
                 { status: 422 },
               );
