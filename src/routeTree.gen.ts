@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as ApiSearchRecipesByIngredientRouteImport } from './routes/api/search-recipes-by-ingredient'
 import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
 import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
@@ -36,6 +37,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiSearchRecipesByIngredientRoute =
+  ApiSearchRecipesByIngredientRouteImport.update({
+    id: '/api/search-recipes-by-ingredient',
+    path: '/api/search-recipes-by-ingredient',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiExtractRecipeVideoRoute = ApiExtractRecipeVideoRouteImport.update({
   id: '/api/extract-recipe-video',
   path: '/api/extract-recipe-video',
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
+  '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
   '/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
@@ -104,6 +112,7 @@ export interface FileRoutesByTo {
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
+  '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
   '/': typeof AuthenticatedIndexRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
@@ -119,6 +128,7 @@ export interface FileRoutesById {
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
+  '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/_authenticated/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
+    | '/api/search-recipes-by-ingredient'
     | '/explorar/$id'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
+    | '/api/search-recipes-by-ingredient'
     | '/'
     | '/explorar/$id'
     | '/receita/$id'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
+    | '/api/search-recipes-by-ingredient'
     | '/_authenticated/'
     | '/_authenticated/explorar/$id'
     | '/_authenticated/receita/$id'
@@ -173,6 +186,7 @@ export interface RootRouteChildren {
   ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
   ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
+  ApiSearchRecipesByIngredientRoute: typeof ApiSearchRecipesByIngredientRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -197,6 +211,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/search-recipes-by-ingredient': {
+      id: '/api/search-recipes-by-ingredient'
+      path: '/api/search-recipes-by-ingredient'
+      fullPath: '/api/search-recipes-by-ingredient'
+      preLoaderRoute: typeof ApiSearchRecipesByIngredientRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/extract-recipe-video': {
       id: '/api/extract-recipe-video'
@@ -316,6 +337,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiExtractRecipeRoute: ApiExtractRecipeRoute,
   ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
+  ApiSearchRecipesByIngredientRoute: ApiSearchRecipesByIngredientRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
