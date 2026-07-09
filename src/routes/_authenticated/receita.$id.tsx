@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, ChefHat, Clock, ExternalLink, ShoppingCart, Trash2, Users } from "lucide-react";
+import { ArrowLeft, ChefHat, Clock, ExternalLink, ShoppingCart, Star, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -33,6 +33,7 @@ function RecipeDetail() {
   const hydrated = useHydrated();
   const recipe = useStore((s) => s.recipes.find((r) => r.id === id));
   const deleteRecipe = useStore((s) => s.deleteRecipe);
+  const toggleFavorite = useStore((s) => s.toggleFavorite);
   const addToList = useStore((s) => s.addRecipeToShoppingList);
 
   const [servings, setServings] = useState(recipe?.servings ?? 1);
@@ -90,13 +91,29 @@ function RecipeDetail() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <button
-            onClick={() => setConfirmOpen(true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-destructive shadow-md backdrop-blur transition hover:bg-card"
-            aria-label="Excluir receita"
-          >
-            <Trash2 className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => toggleFavorite(recipe.id)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card/95 shadow-md backdrop-blur transition hover:bg-card"
+              aria-label={recipe.isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+              aria-pressed={Boolean(recipe.isFavorite)}
+            >
+              <Star
+                className="h-5 w-5"
+                style={{
+                  color: recipe.isFavorite ? "#E7457A" : "#6b7280",
+                  fill: recipe.isFavorite ? "#E7457A" : "transparent",
+                }}
+              />
+            </button>
+            <button
+              onClick={() => setConfirmOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card/95 text-destructive shadow-md backdrop-blur transition hover:bg-card"
+              aria-label="Excluir receita"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </div>
 
