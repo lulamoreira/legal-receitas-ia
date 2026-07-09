@@ -271,36 +271,64 @@ async function findRecipeUrlsViaAi(
     | { choices?: Array<{ message?: { content?: string } }> }
     | null;
   const content = payload?.choices?.[0]?.message?.content ?? "";
-  if (!content) return [];
+  if (!content) {
+    console.error(`[search-recipes] ai ${domain} -> empty content`);
+    return [];
+  }
 
   let arr: unknown;
   try {
     arr = JSON.parse(extractJson(content));
   } catch {
-    console.error(`[search-recipes] ai json parse failed for ${domain}`);
+    console.error(
+      `[search-recipes] ai json parse failed for ${domain}. content preview: ${content.slice(0, 300)}`,
+    );
     return [];
   }
-  if (!Array.isArray(arr)) return [];
+  if (!Array.isArray(arr)) {
+    console.error(
+      `[search-recipes] ai ${domain} -> parsed but not array (type=${typeof arr})`,
+    );
+    return [];
+  }
 
+  const rawCount = arr.length;
+  const rejected: string[] = [];
   const urls: string[] = [];
   const seen = new Set<string>();
   for (const item of arr) {
-    if (typeof item !== "string") continue;
+    if (typeof item !== "string") {
+      rejected.push(`non-string:${typeof item}`);
+      continue;
+    }
     let u: URL;
     try {
       u = new URL(item);
     } catch {
+      rejected.push(`invalid-url:${item.slice(0, 80)}`);
       continue;
     }
-    if (u.protocol !== "http:" && u.protocol !== "https:") continue;
+    if (u.protocol !== "http:" && u.protocol !== "https:") {
+      rejected.push(`bad-protocol:${u.protocol}`);
+      continue;
+    }
     const host = u.hostname.toLowerCase();
     // Validação de domínio: hostname deve terminar exatamente em `domain`
-    if (host !== domain && !host.endsWith(`.${domain}`)) continue;
+    if (host !== domain && !host.endsWith(`.${domain}`)) {
+      rejected.push(`host-mismatch:${host}`);
+      continue;
+    }
     const clean = u.toString();
-    if (seen.has(clean)) continue;
+    if (seen.has(clean)) {
+      rejected.push(`duplicate:${host}`);
+      continue;
+    }
     seen.add(clean);
     urls.push(clean);
   }
+  console.error(
+    `[search-recipes] ai ${domain} -> raw=${rawCount}, accepted=${urls.length}, rejected=${rejected.length} [${rejected.slice(0, 5).join(" | ")}]`,
+  );
   return urls;
 }
 
@@ -428,14 +456,33 @@ async function searchViaAiAndPreview(
 ): Promise<Result[]> {
   const work = (async () => {
     const urls = await findRecipeUrlsViaAi(apiKey, domain, ingredient, 3);
-    if (urls.length === 0) return [] as Result[];
+    if (urls.length === 0) {
+      console.error(
+        `[search-recipes] preview ${source} (${domain}) -> 0 URLs from AI, skipping preview`,
+      );
+      return [] as Result[];
+    }
+    const toPreview = urls.slice(0, 5);
+    console.error(
+      `[search-recipes] preview ${source} (${domain}) -> attempting ${toPreview.length} URLs: ${toPreview.join(" , ")}`,
+    );
     const previews = await Promise.allSettled(
-      urls.slice(0, 5).map((u) => previewRecipeUrl(u, source)),
+      toPreview.map((u) => previewRecipeUrl(u, source)),
     );
     const out: Result[] = [];
-    for (const p of previews) {
-      if (p.status === "fulfilled" && p.value) out.push(p.value);
-    }
+    const failures: string[] = [];
+    previews.forEach((p, i) => {
+      if (p.status === "fulfilled" && p.value) {
+        out.push(p.value);
+      } else if (p.status === "fulfilled") {
+        failures.push(`null-preview:${toPreview[i]}`);
+      } else {
+        failures.push(`rejected:${toPreview[i]}:${String(p.reason).slice(0, 80)}`);
+      }
+    });
+    console.error(
+      `[search-recipes] preview ${source} (${domain}) -> ${out.length}/${toPreview.length} succeeded, failures=[${failures.slice(0, 5).join(" | ")}]`,
+    );
     return out;
   })();
 
