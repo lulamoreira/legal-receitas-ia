@@ -66,7 +66,7 @@ export const Route = createFileRoute("/api/suggest-dishes")({
 
           const { fridge, protein, timeMinutes, people, restrictions, mood, likedDishes } = parsed.data;
 
-          const systemPrompt = `Você é a "Vó", uma cozinheira brasileira acolhedora, bem-humorada e direta. Fala em primeira pessoa com carinho, sem enrolação. Sugere pratos práticos usando o que a pessoa tem em casa.
+          const systemPrompt = `Você é a "Nona", uma avó italiana movida a inteligência artificial — cozinheira acolhedora, bem-humorada e direta, que fala português com toques leves de italiano ("piccolino", "una bellezza", "mamma mia", "andiamo", "che buono"), sem exagerar e sem perder a clareza. Fala em primeira pessoa com carinho, sem enrolação. Sugere pratos práticos usando o que a pessoa tem em casa.
 
 REGRAS OBRIGATÓRIAS:
 - SEMPRE em português do Brasil.
@@ -113,7 +113,7 @@ Responda APENAS JSON válido neste formato:
             const txt = await gatewayRes.text().catch(() => "");
             console.error("[suggest-dishes] gateway", gatewayRes.status, txt);
             if (gatewayRes.status === 429)
-              return Response.json({ error: "Muita gente pedindo ideia pra vó ao mesmo tempo. Tenta de novo em instantes." }, { status: 429 });
+              return Response.json({ error: "Muita gente pedindo ideia pra Nona ao mesmo tempo. Tenta de novo em instantes." }, { status: 429 });
             if (gatewayRes.status === 402)
               return Response.json({ error: "Créditos de IA esgotados." }, { status: 402 });
             return Response.json({ error: "Xi, deu um nó na minha rede aqui. Tenta de novo?" }, { status: 502 });
@@ -121,19 +121,19 @@ Responda APENAS JSON válido neste formato:
 
           const payload = await gatewayRes.json();
           const content: string | undefined = payload?.choices?.[0]?.message?.content;
-          if (!content) return Response.json({ error: "A vó ficou sem palavras. Tenta de novo?" }, { status: 502 });
+          if (!content) return Response.json({ error: "A Nona ficou sem palavras. Tenta de novo?" }, { status: 502 });
 
           let raw: unknown;
           try {
             raw = JSON.parse(extractJson(content));
           } catch {
-            return Response.json({ error: "A vó se enrolou pra responder. Tenta de novo?" }, { status: 502 });
+            return Response.json({ error: "A Nona se enrolou pra responder. Tenta de novo?" }, { status: 502 });
           }
 
           const validated = responseSchema.safeParse(raw);
           if (!validated.success) {
             console.error("[suggest-dishes] schema fail", validated.error.issues);
-            return Response.json({ error: "A vó respondeu esquisito. Tenta de novo?" }, { status: 502 });
+            return Response.json({ error: "A Nona respondeu esquisito. Tenta de novo?" }, { status: 502 });
           }
 
           const dishes = validated.data.dishes.slice(0, 5).map((d) => ({

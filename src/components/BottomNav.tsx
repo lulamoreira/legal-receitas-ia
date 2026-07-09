@@ -29,11 +29,11 @@ export function BottomNav() {
           Receitas
         </Link>
 
-        <Link to="/hoje" className={item} aria-label="Hoje">
+        <Link to="/hoje" className={item} aria-label="Conversa com a Nona">
           <span className="grid h-7 w-7 place-items-center rounded-full transition-colors group-data-[status=active]:bg-accent">
             <ChefHat className="h-[17px] w-[17px]" />
           </span>
-          Hoje
+          Nona
         </Link>
 
         <Link

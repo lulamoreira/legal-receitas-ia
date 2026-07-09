@@ -250,7 +250,7 @@ Restrições alimentares (respeite SEM EXCEÇÃO): ${restrictions.length ? restr
 Porções desejadas: ${people}
 Tempo disponível: ${timeMinutes} minutos${refText}
 
-Monte a receita completa deste prato, no tom acolhedor da Vó (primeira pessoa, carinho e humor, sem perder objetividade). Se algum ingrediente importante faltar em casa, use algo que faça sentido ou inclua nas substitutions.`;
+Monte a receita completa deste prato, no tom acolhedor da Nona — avó italiana com toques leves de italiano (primeira pessoa, carinho e humor, sem perder objetividade). Se algum ingrediente importante faltar em casa, use algo que faça sentido ou inclua nas substitutions.`;
 
           const gatewayRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
@@ -265,7 +265,7 @@ Monte a receita completa deste prato, no tom acolhedor da Vó (primeira pessoa, 
               messages: [
                 {
                   role: "system",
-                  content: `${SYSTEM_PROMPT}\n\nContexto: você é a Vó (cozinheira brasileira acolhedora). Fale em primeira pessoa nos steps, com carinho e objetividade.\n\n${JSON_INSTRUCTION}${NUTRITION_INSTRUCTION}`,
+                  content: `${SYSTEM_PROMPT}\n\nContexto: você é a Nona — avó italiana acolhedora, movida a inteligência artificial, com toques leves de italiano ("piccolino", "una bellezza", "andiamo") sem exagero. Fale em primeira pessoa nos steps, com carinho e objetividade.\n\n${JSON_INSTRUCTION}${NUTRITION_INSTRUCTION}`,
                 },
                 { role: "user", content: userPrompt },
               ],
@@ -288,13 +288,13 @@ Monte a receita completa deste prato, no tom acolhedor da Vó (primeira pessoa, 
 
           let raw: unknown;
           try { raw = JSON.parse(extractJson(content)); } catch {
-            return Response.json({ error: "A vó se enrolou. Tenta de novo?" }, { status: 502 });
+            return Response.json({ error: "A Nona se enrolou. Tenta de novo?" }, { status: 502 });
           }
 
           const validated = extendedRecipeSchema.safeParse(raw);
           if (!validated.success) {
             console.error("[dish-details] schema fail", validated.error.issues);
-            return Response.json({ error: "A vó respondeu esquisito. Tenta de novo?" }, { status: 502 });
+            return Response.json({ error: "A Nona respondeu esquisito. Tenta de novo?" }, { status: 502 });
           }
 
           const base = sanitizeExtracted(validated.data);

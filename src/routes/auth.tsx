@@ -103,20 +103,20 @@ function AuthPage() {
         <div className="flex flex-col items-center text-center">
           <img
             src="/favicon.png"
-            alt="Caderno de Vó"
+            alt="Nona Neural"
             width={80}
             height={80}
             className="mb-4 h-20 w-20 drop-shadow-sm"
           />
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-            Caderno de Vó
+            Nona Neural
           </p>
           <h1 className="mt-1 font-serif text-3xl leading-tight text-foreground">
-            Suas receitas em qualquer lugar
+            A cozinha da Nona te espera
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Entre pra sincronizar suas receitas e a lista de compras entre
-            celular, tablet e computador.
+            Entre pra Nona guardar suas receitas e sua lista de compras — no
+            celular, no tablet e no computador.
           </p>
         </div>
 

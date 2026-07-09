@@ -83,13 +83,13 @@ function Index() {
       <header className="mb-6 flex items-start gap-3">
         <img
           src="/favicon.png"
-          alt="Caderno de Vó"
+          alt="Nona Neural"
           width={64}
           height={64}
           className="h-16 w-16 shrink-0 drop-shadow-sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Caderno de Vó</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Nona Neural</p>
           <h1 className="mt-0.5 font-serif text-[28px] leading-tight text-foreground">
             O que vamos cozinhar hoje?
           </h1>
