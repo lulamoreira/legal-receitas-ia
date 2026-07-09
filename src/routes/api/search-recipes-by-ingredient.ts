@@ -97,18 +97,26 @@ function parseTudoGostoso(html: string, ingredient: string): Result[] {
   while ((m = anchorRe.exec(html))) {
     const href = m[1];
     const inner = m[2];
+    const anchorStart = m.index;
     const url = absUrl(href, base);
     if (!url) continue;
     if (seen.has(url)) continue;
-    // Find image in inner
+    // Thumbnail lives BEFORE the anchor as a sibling <img>, not inside it.
+    // Scan the ~1500 chars preceding the anchor for the last matching <img>.
     let thumb: string | null = null;
-    const imgMatch = inner.match(/<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i);
-    if (imgMatch) {
+    const windowStart = Math.max(0, anchorStart - 1500);
+    const before = html.slice(windowStart, anchorStart);
+    const imgRe = /<img\b[^>]*?(?:src|data-src)=["']([^"']+)["'][^>]*>/gi;
+    let imgMatch: RegExpExecArray | null;
+    let lastSrc: string | null = null;
+    while ((imgMatch = imgRe.exec(before))) {
       const src = imgMatch[1];
-      if (/145-110|300x300/.test(src) && !/40x40/.test(src)) {
-        thumb = src;
+      if (/145-110/.test(src) && !/40x40/.test(src)) {
+        lastSrc = src;
       }
     }
+    if (lastSrc) thumb = lastSrc;
+
     let title = stripTags(inner);
     if (!title) {
       const altMatch = inner.match(/alt=["']([^"']+)["']/i);
@@ -118,6 +126,7 @@ function parseTudoGostoso(html: string, ingredient: string): Result[] {
     seen.add(url);
     out.push({ title, url, thumbnailUrl: thumb, source: "TudoGostoso" });
   }
+
   const needle = normalize(ingredient);
   return out.filter((r) => normalize(r.title).includes(needle));
 }
