@@ -79,6 +79,22 @@ export const useStore = create<State>()((set, get) => ({
     }
   },
 
+  toggleFavorite: async (id) => {
+    const prev = get().recipes;
+    const idx = prev.findIndex((r) => r.id === id);
+    if (idx < 0) return;
+    const nextFav = !prev[idx]!.isFavorite;
+    const next = [...prev];
+    next[idx] = { ...prev[idx]!, isFavorite: nextFav };
+    set({ recipes: next });
+    try {
+      await toggleFavoriteRecipe({ data: { id } });
+    } catch (e) {
+      console.error("[toggleFavorite]", e);
+      set({ recipes: prev });
+    }
+  },
+
   addRecipeToShoppingList: async (recipeId, servings) => {
     const recipe = get().recipes.find((r) => r.id === recipeId);
     const useServings = servings ?? recipe?.servings ?? 1;
