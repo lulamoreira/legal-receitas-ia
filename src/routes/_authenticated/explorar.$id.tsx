@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import type { Recipe } from "@/lib/types";
 
-export const Route = createFileRoute("/explorar/$id")({
+export const Route = createFileRoute("/_authenticated/explorar/$id")({
   component: CatalogRecipeDetail,
 });
 

@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/receita/$id")({
+export const Route = createFileRoute("/_authenticated/receita/$id")({
   component: RecipeDetail,
   notFoundComponent: () => (
     <div className="px-4 pt-16 text-center">

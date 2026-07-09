@@ -8,7 +8,7 @@ import { IngredientRow } from "@/components/IngredientRow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 
-export const Route = createFileRoute("/importar")({
+export const Route = createFileRoute("/_authenticated/importar")({
   component: Importar,
 });
 

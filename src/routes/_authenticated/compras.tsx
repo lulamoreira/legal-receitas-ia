@@ -7,7 +7,7 @@ import { AISLES, type Aisle } from "@/lib/types";
 import { formatQuantity } from "@/lib/format";
 import { pastelForIndex } from "@/components/RecipeCard";
 
-export const Route = createFileRoute("/compras")({
+export const Route = createFileRoute("/_authenticated/compras")({
   component: Compras,
 });
 
