@@ -19,6 +19,7 @@ import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-re
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
 import { Route as ApiDishDetailsRouteImport } from './routes/api/dish-details'
 import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
+import { Route as AuthenticatedHojeRouteImport } from './routes/_authenticated/hoje'
 import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticated/explorar'
 import { Route as AuthenticatedComprasRouteImport } from './routes/_authenticated/compras'
 import { Route as AuthenticatedReceitaIdRouteImport } from './routes/_authenticated/receita.$id'
@@ -76,6 +77,11 @@ const AuthenticatedImportarRoute = AuthenticatedImportarRouteImport.update({
   path: '/importar',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHojeRoute = AuthenticatedHojeRouteImport.update({
+  id: '/hoje',
+  path: '/hoje',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedExplorarRoute = AuthenticatedExplorarRouteImport.update({
   id: '/explorar',
   path: '/explorar',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compras': typeof AuthenticatedComprasRoute
   '/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/hoje': typeof AuthenticatedHojeRoute
   '/importar': typeof AuthenticatedImportarRoute
   '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/compras': typeof AuthenticatedComprasRoute
   '/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/hoje': typeof AuthenticatedHojeRoute
   '/importar': typeof AuthenticatedImportarRoute
   '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/compras': typeof AuthenticatedComprasRoute
   '/_authenticated/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/_authenticated/hoje': typeof AuthenticatedHojeRoute
   '/_authenticated/importar': typeof AuthenticatedImportarRoute
   '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compras'
     | '/explorar'
+    | '/hoje'
     | '/importar'
     | '/api/dish-details'
     | '/api/extract-recipe'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compras'
     | '/explorar'
+    | '/hoje'
     | '/importar'
     | '/api/dish-details'
     | '/api/extract-recipe'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/compras'
     | '/_authenticated/explorar'
+    | '/_authenticated/hoje'
     | '/_authenticated/importar'
     | '/api/dish-details'
     | '/api/extract-recipe'
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImportarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/hoje': {
+      id: '/_authenticated/hoje'
+      path: '/hoje'
+      fullPath: '/hoje'
+      preLoaderRoute: typeof AuthenticatedHojeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/explorar': {
       id: '/_authenticated/explorar'
       path: '/explorar'
@@ -375,6 +394,7 @@ const AuthenticatedReceitaIdRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedComprasRoute: typeof AuthenticatedComprasRoute
   AuthenticatedExplorarRoute: typeof AuthenticatedExplorarRouteWithChildren
+  AuthenticatedHojeRoute: typeof AuthenticatedHojeRoute
   AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCategoriaSlugRoute: typeof AuthenticatedCategoriaSlugRoute
@@ -384,6 +404,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedComprasRoute: AuthenticatedComprasRoute,
   AuthenticatedExplorarRoute: AuthenticatedExplorarRouteWithChildren,
+  AuthenticatedHojeRoute: AuthenticatedHojeRoute,
   AuthenticatedImportarRoute: AuthenticatedImportarRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCategoriaSlugRoute: AuthenticatedCategoriaSlugRoute,
