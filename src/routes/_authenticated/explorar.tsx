@@ -247,7 +247,7 @@ function IngredientSearch() {
 
       {loading ? (
         <div className="rounded-2xl bg-card p-8 text-center text-sm text-muted-foreground shadow-[var(--shadow-soft)]">
-          Buscando receitas com {searched}…
+          Buscando receitas com {searched}… isso pode levar até 20 segundos.
         </div>
       ) : !searched ? (
         <div className="rounded-2xl bg-card p-8 text-center shadow-[var(--shadow-soft)]">
