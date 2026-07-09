@@ -4,6 +4,7 @@ import { Search, Sparkles, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { RecipeCard } from "@/components/RecipeCard";
+import { UserMenu } from "@/components/UserMenu";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
