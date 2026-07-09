@@ -46,9 +46,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="font-serif text-xl text-foreground">Algo desandou no forno</h1>
+        <h1 className="font-serif text-xl text-foreground">Mamma mia, queimou a panela!</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Deu ruim ao carregar essa página. Tente de novo ou volte ao início.
+          A Nona se atrapalhou ao carregar essa página. Tenta de novo, piccolino, ou volta pro começo.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -77,24 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Nona Neural — Suas receitas favoritas, organizadas pela IA" },
+      { title: "Nona Neural — A avó italiana que cozinha com você" },
       {
         name: "description",
         content:
-          "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português.",
+          "A Nona Neural é a sua avó italiana com superpoderes de IA: importa receitas de qualquer lugar, monta sua lista de compras por corredor e te acompanha no fogão, passo a passo.",
       },
-      { name: "author", content: "Caderno de Vó" },
-      { property: "og:title", content: "Nona Neural — Suas receitas favoritas, organizadas pela IA" },
+      { name: "author", content: "Nona Neural" },
+      { property: "og:title", content: "Nona Neural — A avó italiana que cozinha com você" },
       {
         property: "og:description",
         content:
-          "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português.",
+          "A Nona Neural é a sua avó italiana com superpoderes de IA: importa receitas de qualquer lugar, monta sua lista de compras por corredor e te acompanha no fogão, passo a passo.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#FAF6EF" },
-      { name: "twitter:title", content: "Nona Neural — Suas receitas favoritas, organizadas pela IA" },
-      { name: "twitter:description", content: "Cole a legenda de qualquer Reel ou TikTok de receita e a IA organiza tudo pra você: ingredientes, modo de preparo e lista de compras. Em português." },
+      { name: "twitter:title", content: "Nona Neural — A avó italiana que cozinha com você" },
+      { name: "twitter:description", content: "A Nona Neural é a sua avó italiana com superpoderes de IA: importa receitas de qualquer lugar, monta sua lista de compras por corredor e te acompanha no fogão, passo a passo." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a32e0228-77ed-4b34-affa-70ef29172494/id-preview-0dc66834--6bc68399-1ea6-4a3a-83be-1cb050224ce2.lovable.app-1783521690357.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a32e0228-77ed-4b34-affa-70ef29172494/id-preview-0dc66834--6bc68399-1ea6-4a3a-83be-1cb050224ce2.lovable.app-1783521690357.png" },
     ],

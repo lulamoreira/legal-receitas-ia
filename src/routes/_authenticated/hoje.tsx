@@ -144,14 +144,14 @@ function HojeRoute() {
         if (profile.restrictions.length) setRestrictions(profile.restrictions);
         setLikedTitles(profile.likedDishes.map((d) => d.title));
         const opener: Bubble[] = [
-          { role: "vo", text: "Oi, meu bem! Que bom te ver aqui. 💛", key: "op1" },
-          { role: "vo", text: "Conta pra vó: o que tem na sua geladeira e na despensa agora?", key: "op2" },
+          { role: "vo", text: "Ciao, piccolino! Que bom te ver aqui. 💛", key: "op1" },
+          { role: "vo", text: "Conta pra Nona, piccolino: o que tem na sua geladeira e na despensa agora?", key: "op2" },
         ];
         setBubbles(opener);
       } catch (e) {
         console.error(e);
         setBubbles([
-          { role: "vo", text: "Oi, meu bem! Conta pra vó: o que tem na sua geladeira?", key: "op-fb" },
+          { role: "vo", text: "Oi, meu bem! Conta pra Nona: o que tem na sua geladeira?", key: "op-fb" },
         ]);
       } finally {
         if (mounted) setProfileLoaded(true);
@@ -247,7 +247,7 @@ function HojeRoute() {
     setMood(m);
     pushUser(m);
     setStep("suggesting");
-    setTimeout(() => pushVo("Deixa a vó pensar… 🤔"), 250);
+    setTimeout(() => pushVo("Deixa a Nona pensar… 🤌"), 250);
     try {
       const res = await fetch("/api/suggest-dishes", {
         method: "POST",
@@ -266,7 +266,7 @@ function HojeRoute() {
       if (!res.ok) throw new Error(data?.error || "Erro ao pedir sugestões.");
       setDishes(data.dishes || []);
       setStep("results");
-      pushVo("Olha o que a vó pensou pra você:");
+      pushVo("Olha o que a Nona pensou pra você:");
     } catch (e) {
       pushVo(e instanceof Error ? e.message : "Xi, deu um nó aqui. Tenta de novo?");
       setStep("mood");
@@ -349,7 +349,7 @@ function HojeRoute() {
         )}
         <div>
           <h1 className="font-serif text-xl text-foreground">O que eu faço hoje?</h1>
-          <p className="text-xs text-muted-foreground">Uma conversa com a Vó</p>
+          <p className="text-xs text-muted-foreground">Conversa com a Nona</p>
         </div>
       </header>
 
@@ -496,7 +496,7 @@ function HojeRoute() {
               <button
                 onClick={() => {
                   setStep("fridge");
-                  setBubbles([{ role: "vo", text: "Vamos de novo! Conta pra vó: o que tem na sua geladeira?", key: `restart-${Date.now()}` }]);
+                  setBubbles([{ role: "vo", text: "Andiamo de novo! Conta pra Nona: o que tem na sua geladeira?", key: `restart-${Date.now()}` }]);
                   setDishes([]);
                   setFridge("");
                   setProtein("");
@@ -510,7 +510,7 @@ function HojeRoute() {
             )}
 
             {step === "suggesting" && (
-              <div className="text-center text-xs text-muted-foreground">A vó tá pensando…</div>
+              <div className="text-center text-xs text-muted-foreground">A Nona tá pensando…</div>
             )}
           </div>
         </>
@@ -667,7 +667,7 @@ function DetailView({
 
       {details.sourcesConsulted.length > 0 && (
         <section className="mt-4 rounded-3xl bg-card p-5 shadow-[var(--shadow-soft)]">
-          <h3 className="mb-3 font-serif text-lg">Versões que a vó consultou</h3>
+          <h3 className="mb-3 font-serif text-lg">Versões que a Nona consultou</h3>
           <ul className="space-y-2">
             {details.sourcesConsulted.map((s) => (
               <li key={s.url}>
