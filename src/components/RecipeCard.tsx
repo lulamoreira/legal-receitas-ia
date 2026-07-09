@@ -25,51 +25,47 @@ export function RecipeCard({ recipe, index = 0, to = "/receita/$id" }: RecipeCar
     <Link
       to={to}
       params={{ id: recipe.id }}
-      className="group block rounded-3xl p-4 shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5 hover:shadow-[var(--shadow-warm)]"
+      className="group block overflow-hidden rounded-3xl shadow-[var(--shadow-soft)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-warm)] focus-visible:-translate-y-1"
       style={{ backgroundColor: p.bg }}
     >
-      <div className="mb-3 flex h-24 items-center justify-center overflow-hidden rounded-2xl bg-white text-5xl shadow-sm">
+      <div className="relative aspect-[4/3] overflow-hidden bg-white">
         {recipe.imageUrl ? (
           <img
             src={recipe.imageUrl}
             alt={recipe.title}
             loading="lazy"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <span aria-hidden>{recipe.emoji}</span>
+          <div className="grid h-full place-items-center text-6xl" aria-hidden>
+            {recipe.emoji}
+          </div>
+        )}
+        {recipe.tags.length > 0 && (
+          <span
+            className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide backdrop-blur"
+            style={{ backgroundColor: `${p.tagBg}dd`, color: p.tagText }}
+          >
+            {recipe.tags[0]}
+          </span>
         )}
       </div>
 
-      <h3 className="font-serif text-lg font-bold leading-tight" style={{ color: p.title }}>
-        {recipe.title}
-      </h3>
-      <p className="mt-1 line-clamp-2 text-sm" style={{ color: p.meta }}>
-        {recipe.description}
-      </p>
-      <div className="mt-3 flex items-center gap-3 text-xs" style={{ color: p.meta }}>
-        <span className="inline-flex items-center gap-1">
-          <Clock className="h-3.5 w-3.5" />
-          {recipe.totalMinutes} min
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <Users className="h-3.5 w-3.5" />
-          {recipe.servings}
-        </span>
-      </div>
-      {recipe.tags.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1">
-          {recipe.tags.slice(0, 3).map((t) => (
-            <span
-              key={t}
-              className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-              style={{ backgroundColor: p.tagBg, color: p.tagText }}
-            >
-              {t}
-            </span>
-          ))}
+      <div className="p-3">
+        <h3 className="font-serif text-[15px] font-bold leading-tight line-clamp-2 min-h-[2.6em]" style={{ color: p.title }}>
+          {recipe.title}
+        </h3>
+        <div className="mt-2 flex items-center gap-3 text-[11px] font-medium" style={{ color: p.meta }}>
+          <span className="inline-flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {recipe.totalMinutes} min
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Users className="h-3 w-3" />
+            {recipe.servings}
+          </span>
         </div>
-      )}
+      </div>
     </Link>
   );
 }
