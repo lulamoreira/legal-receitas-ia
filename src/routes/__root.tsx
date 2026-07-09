@@ -132,23 +132,33 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
 
   useEffect(() => {
-    // Zustand persist is configured with skipHydration to avoid SSR/CSR
-    // mismatches; trigger rehydration on the client after mount.
-    void import("../lib/store").then((m) => m.useStore.persist.rehydrate());
-  }, []);
+    let mounted = true;
+    // Import client lazily to avoid SSR issues
+    void import("../integrations/supabase/client").then(({ supabase }) => {
+      if (!mounted) return;
+      const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+        router.invalidate();
+        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      });
+      // Save unsubscribe for cleanup
+      (window as any).__supabase_auth_sub__ = sub;
+    });
+    return () => {
+      mounted = false;
+      try {
+        (window as any).__supabase_auth_sub__?.subscription?.unsubscribe?.();
+      } catch {}
+    };
+  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div
-        className="min-h-screen bg-background"
-        style={{ paddingBottom: "calc(7rem + env(safe-area-inset-bottom))" }}
-      >
-        <div className="mx-auto max-w-md">
-          <Outlet />
-        </div>
-        <BottomNav />
+      <div className="min-h-screen bg-background">
+        <Outlet />
         <Toaster position="top-center" richColors closeButton />
       </div>
     </QueryClientProvider>

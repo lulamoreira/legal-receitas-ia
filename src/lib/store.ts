@@ -1,104 +1,147 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { Recipe, ShoppingItem, ExtractedRecipe } from "./types";
-import { SEED_RECIPES } from "./seed";
-import { uid } from "./format";
+import {
+  listUserRecipes,
+  createUserRecipe,
+  deleteUserRecipe,
+  bulkImportUserRecipes,
+} from "./user-recipes.functions";
+import {
+  listShoppingItems,
+  addRecipeToShopping,
+  toggleShoppingItem,
+  clearCheckedShoppingItems,
+  bulkImportShoppingItems,
+} from "./user-shopping.functions";
 
 type State = {
   recipes: Recipe[];
   shoppingList: ShoppingItem[];
-  addRecipe: (r: ExtractedRecipe) => Recipe;
-  deleteRecipe: (id: string) => void;
-  addRecipeToShoppingList: (recipeId: string, servings?: number) => void;
-  toggleItem: (id: string) => void;
-  clearChecked: () => void;
+  hydrated: boolean;
+  loading: boolean;
+  hydrate: () => Promise<void>;
+  reset: () => void;
+  addRecipe: (r: ExtractedRecipe) => Promise<Recipe>;
+  deleteRecipe: (id: string) => Promise<void>;
+  addRecipeToShoppingList: (recipeId: string, servings?: number) => Promise<void>;
+  toggleItem: (id: string) => Promise<void>;
+  clearChecked: () => Promise<void>;
+  importLocalData: (payload: {
+    recipes: Recipe[];
+    shoppingList: ShoppingItem[];
+  }) => Promise<{ recipes: number; items: number }>;
 };
 
-function normalizeName(s: string) {
-  return s.trim().toLowerCase().replace(/\s+/g, " ");
-}
+export const useStore = create<State>()((set, get) => ({
+  recipes: [],
+  shoppingList: [],
+  hydrated: false,
+  loading: false,
 
-function mergeRecipeTitle(existing: string, incoming: string): string {
-  const stripped = existing.replace(/^de:\s*/i, "");
-  const parts = stripped.split(/\s*\+\s*/).map((p) => p.trim()).filter(Boolean);
-  if (!parts.some((p) => p.toLowerCase() === incoming.toLowerCase())) {
-    parts.push(incoming);
-  }
-  return parts.join(" + ");
-}
+  hydrate: async () => {
+    if (get().loading) return;
+    set({ loading: true });
+    try {
+      const [recipes, shoppingList] = await Promise.all([
+        listUserRecipes(),
+        listShoppingItems(),
+      ]);
+      set({ recipes, shoppingList, hydrated: true, loading: false });
+    } catch (e) {
+      console.error("[store.hydrate]", e);
+      set({ loading: false });
+    }
+  },
 
-export const useStore = create<State>()(
-  persist(
-    (set, get) => ({
-      recipes: SEED_RECIPES,
-      shoppingList: [],
+  reset: () =>
+    set({ recipes: [], shoppingList: [], hydrated: false, loading: false }),
 
-      addRecipe: (r) => {
-        const recipe: Recipe = {
-          ...r,
-          id: uid(),
-          createdAt: Date.now(),
-          ingredients: r.ingredients.map((i) => ({ ...i, id: uid() })),
-        };
-        set({ recipes: [recipe, ...get().recipes] });
-        return recipe;
-      },
+  addRecipe: async (r) => {
+    const recipe = await createUserRecipe({ data: r as any });
+    set({ recipes: [recipe, ...get().recipes] });
+    return recipe;
+  },
 
-      deleteRecipe: (id) =>
-        set({
-          recipes: get().recipes.filter((r) => r.id !== id),
-          shoppingList: get().shoppingList.filter((i) => i.recipeId !== id),
-        }),
+  deleteRecipe: async (id) => {
+    const prevRecipes = get().recipes;
+    const prevList = get().shoppingList;
+    set({
+      recipes: prevRecipes.filter((r) => r.id !== id),
+      shoppingList: prevList.filter((i) => i.recipeId !== id),
+    });
+    try {
+      await deleteUserRecipe({ data: { id } });
+    } catch (e) {
+      set({ recipes: prevRecipes, shoppingList: prevList });
+      throw e;
+    }
+  },
 
-      addRecipeToShoppingList: (recipeId, servings) => {
-        const recipe = get().recipes.find((r) => r.id === recipeId);
-        if (!recipe) return;
-        const factor = servings ? servings / recipe.servings : 1;
+  addRecipeToShoppingList: async (recipeId, servings) => {
+    const recipe = get().recipes.find((r) => r.id === recipeId);
+    const useServings = servings ?? recipe?.servings ?? 1;
+    const list = await addRecipeToShopping({
+      data: { recipeId, servings: useServings },
+    });
+    set({ shoppingList: list });
+  },
 
-        const list = [...get().shoppingList];
-        for (const ing of recipe.ingredients) {
-          const scaledQty = ing.quantity * factor;
-          const normName = normalizeName(ing.name);
-          const idx = list.findIndex(
-            (it) =>
-              !it.checked &&
-              it.unit === ing.unit &&
-              normalizeName(it.name) === normName,
-          );
-          if (idx >= 0) {
-            const cur = list[idx]!;
-            list[idx] = {
-              ...cur,
-              quantity: cur.quantity + scaledQty,
-              recipeTitle: mergeRecipeTitle(cur.recipeTitle, recipe.title),
-            };
-          } else {
-            list.push({
-              id: uid(),
-              recipeId: recipe.id,
-              recipeTitle: recipe.title,
-              name: ing.name,
-              quantity: scaledQty,
-              unit: ing.unit,
-              emoji: ing.emoji,
-              aisle: ing.aisle,
-              checked: false,
-            });
-          }
-        }
-        set({ shoppingList: list });
-      },
+  toggleItem: async (id) => {
+    const list = get().shoppingList;
+    const idx = list.findIndex((i) => i.id === id);
+    if (idx < 0) return;
+    const nextChecked = !list[idx]!.checked;
+    const next = [...list];
+    next[idx] = { ...list[idx]!, checked: nextChecked };
+    set({ shoppingList: next });
+    try {
+      await toggleShoppingItem({ data: { id, checked: nextChecked } });
+    } catch (e) {
+      console.error("[toggleItem]", e);
+      set({ shoppingList: list });
+    }
+  },
 
-      toggleItem: (id) =>
-        set({
-          shoppingList: get().shoppingList.map((i) =>
-            i.id === id ? { ...i, checked: !i.checked } : i,
-          ),
-        }),
+  clearChecked: async () => {
+    const prev = get().shoppingList;
+    set({ shoppingList: prev.filter((i) => !i.checked) });
+    try {
+      await clearCheckedShoppingItems();
+    } catch (e) {
+      console.error("[clearChecked]", e);
+      set({ shoppingList: prev });
+    }
+  },
 
-      clearChecked: () =>
-        set({ shoppingList: get().shoppingList.filter((i) => !i.checked) }),
-    }),
-    { name: "receitai-store-v1", skipHydration: true },
-  ),
-);
+  importLocalData: async ({ recipes, shoppingList }) => {
+    let insertedRecipes = 0;
+    let insertedItems = 0;
+    try {
+      if (recipes.length > 0) {
+        const res = await bulkImportUserRecipes({
+          data: { recipes: recipes as any },
+        });
+        insertedRecipes = res.inserted;
+      }
+      if (shoppingList.length > 0) {
+        const res = await bulkImportShoppingItems({
+          data: {
+            items: shoppingList.map((i) => ({
+              recipeTitle: i.recipeTitle,
+              name: i.name,
+              quantity: i.quantity,
+              unit: i.unit,
+              emoji: i.emoji,
+              aisle: i.aisle,
+              checked: i.checked,
+            })),
+          },
+        });
+        insertedItems = res.inserted;
+      }
+    } catch (e) {
+      console.error("[importLocalData]", e);
+    }
+    return { recipes: insertedRecipes, items: insertedItems };
+  },
+}));

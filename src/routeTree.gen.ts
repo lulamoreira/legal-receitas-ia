@@ -9,46 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ImportarRouteImport } from './routes/importar'
-import { Route as ExplorarRouteImport } from './routes/explorar'
-import { Route as ComprasRouteImport } from './routes/compras'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ReceitaIdRouteImport } from './routes/receita.$id'
-import { Route as ExplorarIdRouteImport } from './routes/explorar.$id'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
 import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
-import { Route as ReceitaIdCozinharRouteImport } from './routes/receita.$id.cozinhar'
+import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
+import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticated/explorar'
+import { Route as AuthenticatedComprasRouteImport } from './routes/_authenticated/compras'
+import { Route as AuthenticatedReceitaIdRouteImport } from './routes/_authenticated/receita.$id'
+import { Route as AuthenticatedExplorarIdRouteImport } from './routes/_authenticated/explorar.$id'
+import { Route as AuthenticatedReceitaIdCozinharRouteImport } from './routes/_authenticated/receita.$id.cozinhar'
 
-const ImportarRoute = ImportarRouteImport.update({
-  id: '/importar',
-  path: '/importar',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExplorarRoute = ExplorarRouteImport.update({
-  id: '/explorar',
-  path: '/explorar',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComprasRoute = ComprasRouteImport.update({
-  id: '/compras',
-  path: '/compras',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReceitaIdRoute = ReceitaIdRouteImport.update({
-  id: '/receita/$id',
-  path: '/receita/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExplorarIdRoute = ExplorarIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ExplorarRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiExtractRecipeVideoRoute = ApiExtractRecipeVideoRouteImport.update({
   id: '/api/extract-recipe-video',
@@ -65,53 +51,84 @@ const ApiExtractRecipeRoute = ApiExtractRecipeRouteImport.update({
   path: '/api/extract-recipe',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReceitaIdCozinharRoute = ReceitaIdCozinharRouteImport.update({
-  id: '/cozinhar',
-  path: '/cozinhar',
-  getParentRoute: () => ReceitaIdRoute,
+const AuthenticatedImportarRoute = AuthenticatedImportarRouteImport.update({
+  id: '/importar',
+  path: '/importar',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedExplorarRoute = AuthenticatedExplorarRouteImport.update({
+  id: '/explorar',
+  path: '/explorar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedComprasRoute = AuthenticatedComprasRouteImport.update({
+  id: '/compras',
+  path: '/compras',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReceitaIdRoute = AuthenticatedReceitaIdRouteImport.update({
+  id: '/receita/$id',
+  path: '/receita/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExplorarIdRoute = AuthenticatedExplorarIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedExplorarRoute,
+} as any)
+const AuthenticatedReceitaIdCozinharRoute =
+  AuthenticatedReceitaIdCozinharRouteImport.update({
+    id: '/cozinhar',
+    path: '/cozinhar',
+    getParentRoute: () => AuthenticatedReceitaIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/compras': typeof ComprasRoute
-  '/explorar': typeof ExplorarRouteWithChildren
-  '/importar': typeof ImportarRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/compras': typeof AuthenticatedComprasRoute
+  '/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/importar': typeof AuthenticatedImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
-  '/explorar/$id': typeof ExplorarIdRoute
-  '/receita/$id': typeof ReceitaIdRouteWithChildren
-  '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
+  '/explorar/$id': typeof AuthenticatedExplorarIdRoute
+  '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
+  '/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/compras': typeof ComprasRoute
-  '/explorar': typeof ExplorarRouteWithChildren
-  '/importar': typeof ImportarRoute
+  '/auth': typeof AuthRoute
+  '/compras': typeof AuthenticatedComprasRoute
+  '/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/importar': typeof AuthenticatedImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
-  '/explorar/$id': typeof ExplorarIdRoute
-  '/receita/$id': typeof ReceitaIdRouteWithChildren
-  '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/explorar/$id': typeof AuthenticatedExplorarIdRoute
+  '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
+  '/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/compras': typeof ComprasRoute
-  '/explorar': typeof ExplorarRouteWithChildren
-  '/importar': typeof ImportarRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/compras': typeof AuthenticatedComprasRoute
+  '/_authenticated/explorar': typeof AuthenticatedExplorarRouteWithChildren
+  '/_authenticated/importar': typeof AuthenticatedImportarRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
-  '/explorar/$id': typeof ExplorarIdRoute
-  '/receita/$id': typeof ReceitaIdRouteWithChildren
-  '/receita/$id/cozinhar': typeof ReceitaIdCozinharRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/explorar/$id': typeof AuthenticatedExplorarIdRoute
+  '/_authenticated/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
+  '/_authenticated/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/compras'
     | '/explorar'
     | '/importar'
@@ -123,84 +140,63 @@ export interface FileRouteTypes {
     | '/receita/$id/cozinhar'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/auth'
     | '/compras'
     | '/explorar'
     | '/importar'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
+    | '/'
     | '/explorar/$id'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
   id:
     | '__root__'
-    | '/'
-    | '/compras'
-    | '/explorar'
-    | '/importar'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/compras'
+    | '/_authenticated/explorar'
+    | '/_authenticated/importar'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
-    | '/explorar/$id'
-    | '/receita/$id'
-    | '/receita/$id/cozinhar'
+    | '/_authenticated/'
+    | '/_authenticated/explorar/$id'
+    | '/_authenticated/receita/$id'
+    | '/_authenticated/receita/$id/cozinhar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ComprasRoute: typeof ComprasRoute
-  ExplorarRoute: typeof ExplorarRouteWithChildren
-  ImportarRoute: typeof ImportarRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
   ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
-  ReceitaIdRoute: typeof ReceitaIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/importar': {
-      id: '/importar'
-      path: '/importar'
-      fullPath: '/importar'
-      preLoaderRoute: typeof ImportarRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/explorar': {
-      id: '/explorar'
-      path: '/explorar'
-      fullPath: '/explorar'
-      preLoaderRoute: typeof ExplorarRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compras': {
-      id: '/compras'
-      path: '/compras'
-      fullPath: '/compras'
-      preLoaderRoute: typeof ComprasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/receita/$id': {
-      id: '/receita/$id'
-      path: '/receita/$id'
-      fullPath: '/receita/$id'
-      preLoaderRoute: typeof ReceitaIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/explorar/$id': {
-      id: '/explorar/$id'
-      path: '/$id'
-      fullPath: '/explorar/$id'
-      preLoaderRoute: typeof ExplorarIdRouteImport
-      parentRoute: typeof ExplorarRoute
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/extract-recipe-video': {
       id: '/api/extract-recipe-video'
@@ -223,49 +219,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiExtractRecipeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/receita/$id/cozinhar': {
-      id: '/receita/$id/cozinhar'
+    '/_authenticated/importar': {
+      id: '/_authenticated/importar'
+      path: '/importar'
+      fullPath: '/importar'
+      preLoaderRoute: typeof AuthenticatedImportarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/explorar': {
+      id: '/_authenticated/explorar'
+      path: '/explorar'
+      fullPath: '/explorar'
+      preLoaderRoute: typeof AuthenticatedExplorarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/compras': {
+      id: '/_authenticated/compras'
+      path: '/compras'
+      fullPath: '/compras'
+      preLoaderRoute: typeof AuthenticatedComprasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/receita/$id': {
+      id: '/_authenticated/receita/$id'
+      path: '/receita/$id'
+      fullPath: '/receita/$id'
+      preLoaderRoute: typeof AuthenticatedReceitaIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/explorar/$id': {
+      id: '/_authenticated/explorar/$id'
+      path: '/$id'
+      fullPath: '/explorar/$id'
+      preLoaderRoute: typeof AuthenticatedExplorarIdRouteImport
+      parentRoute: typeof AuthenticatedExplorarRoute
+    }
+    '/_authenticated/receita/$id/cozinhar': {
+      id: '/_authenticated/receita/$id/cozinhar'
       path: '/cozinhar'
       fullPath: '/receita/$id/cozinhar'
-      preLoaderRoute: typeof ReceitaIdCozinharRouteImport
-      parentRoute: typeof ReceitaIdRoute
+      preLoaderRoute: typeof AuthenticatedReceitaIdCozinharRouteImport
+      parentRoute: typeof AuthenticatedReceitaIdRoute
     }
   }
 }
 
-interface ExplorarRouteChildren {
-  ExplorarIdRoute: typeof ExplorarIdRoute
+interface AuthenticatedExplorarRouteChildren {
+  AuthenticatedExplorarIdRoute: typeof AuthenticatedExplorarIdRoute
 }
 
-const ExplorarRouteChildren: ExplorarRouteChildren = {
-  ExplorarIdRoute: ExplorarIdRoute,
+const AuthenticatedExplorarRouteChildren: AuthenticatedExplorarRouteChildren = {
+  AuthenticatedExplorarIdRoute: AuthenticatedExplorarIdRoute,
 }
 
-const ExplorarRouteWithChildren = ExplorarRoute._addFileChildren(
-  ExplorarRouteChildren,
-)
+const AuthenticatedExplorarRouteWithChildren =
+  AuthenticatedExplorarRoute._addFileChildren(
+    AuthenticatedExplorarRouteChildren,
+  )
 
-interface ReceitaIdRouteChildren {
-  ReceitaIdCozinharRoute: typeof ReceitaIdCozinharRoute
+interface AuthenticatedReceitaIdRouteChildren {
+  AuthenticatedReceitaIdCozinharRoute: typeof AuthenticatedReceitaIdCozinharRoute
 }
 
-const ReceitaIdRouteChildren: ReceitaIdRouteChildren = {
-  ReceitaIdCozinharRoute: ReceitaIdCozinharRoute,
+const AuthenticatedReceitaIdRouteChildren: AuthenticatedReceitaIdRouteChildren =
+  {
+    AuthenticatedReceitaIdCozinharRoute: AuthenticatedReceitaIdCozinharRoute,
+  }
+
+const AuthenticatedReceitaIdRouteWithChildren =
+  AuthenticatedReceitaIdRoute._addFileChildren(
+    AuthenticatedReceitaIdRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedComprasRoute: typeof AuthenticatedComprasRoute
+  AuthenticatedExplorarRoute: typeof AuthenticatedExplorarRouteWithChildren
+  AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedReceitaIdRoute: typeof AuthenticatedReceitaIdRouteWithChildren
 }
 
-const ReceitaIdRouteWithChildren = ReceitaIdRoute._addFileChildren(
-  ReceitaIdRouteChildren,
-)
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedComprasRoute: AuthenticatedComprasRoute,
+  AuthenticatedExplorarRoute: AuthenticatedExplorarRouteWithChildren,
+  AuthenticatedImportarRoute: AuthenticatedImportarRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedReceitaIdRoute: AuthenticatedReceitaIdRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ComprasRoute: ComprasRoute,
-  ExplorarRoute: ExplorarRouteWithChildren,
-  ImportarRoute: ImportarRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ApiExtractRecipeRoute: ApiExtractRecipeRoute,
   ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
-  ReceitaIdRoute: ReceitaIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
