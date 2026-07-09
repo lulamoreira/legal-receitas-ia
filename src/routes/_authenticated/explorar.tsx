@@ -15,7 +15,13 @@ type SearchResult = {
   title: string;
   url: string;
   thumbnailUrl: string | null;
-  source: "TudoGostoso" | "Guia da Cozinha";
+  source:
+    | "TudoGostoso"
+    | "Guia da Cozinha"
+    | "Fritadeira Sem Óleo"
+    | "Panelinha"
+    | "Receitas Nestlé"
+    | "Receitas Globo";
 };
 
 type ItemStatus = "idle" | "loading" | "done";
