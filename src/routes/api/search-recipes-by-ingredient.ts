@@ -5,7 +5,7 @@ import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
 const HOUR_MS = 60 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 10_000;
 const MAX_BYTES = 800 * 1024;
-const AI_SITE_DEADLINE_MS = 12_000;
+const AI_SITE_DEADLINE_MS = 18_000;
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
