@@ -5,6 +5,7 @@ import {
   createUserRecipe,
   deleteUserRecipe,
   bulkImportUserRecipes,
+  toggleFavoriteRecipe,
 } from "./user-recipes.functions";
 import {
   listShoppingItems,
@@ -23,6 +24,7 @@ type State = {
   reset: () => void;
   addRecipe: (r: ExtractedRecipe) => Promise<Recipe>;
   deleteRecipe: (id: string) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
   addRecipeToShoppingList: (recipeId: string, servings?: number) => Promise<void>;
   toggleItem: (id: string) => Promise<void>;
   clearChecked: () => Promise<void>;

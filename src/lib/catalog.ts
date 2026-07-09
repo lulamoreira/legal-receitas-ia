@@ -53,6 +53,7 @@ export function catalogRowToRecipe(row: CatalogRow): Recipe {
     ingredients,
     steps: row.steps ?? [],
     imageUrl: row.image_url ?? undefined,
+    isFavorite: false,
     createdAt: new Date(row.created_at).getTime(),
   };
 }
