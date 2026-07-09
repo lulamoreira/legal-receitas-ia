@@ -454,42 +454,48 @@ async function searchViaAiAndPreview(
   source: Source,
   ingredient: string,
 ): Promise<Result[]> {
+  // Accumulator shared entre o "work" e o "timeout" — se estourar o deadline,
+  // ainda retornamos os previews que já foram concluídos.
+  const collected: Result[] = [];
+  let toPreviewCount = 0;
+
   const work = (async () => {
     const urls = await findRecipeUrlsViaAi(apiKey, domain, ingredient, 3);
     if (urls.length === 0) {
       console.error(
         `[search-recipes] preview ${source} (${domain}) -> 0 URLs from AI, skipping preview`,
       );
-      return [] as Result[];
+      return collected;
     }
-    const toPreview = urls.slice(0, 5);
+    const toPreview = urls.slice(0, 3);
+    toPreviewCount = toPreview.length;
     console.error(
       `[search-recipes] preview ${source} (${domain}) -> attempting ${toPreview.length} URLs: ${toPreview.join(" , ")}`,
     );
-    const previews = await Promise.allSettled(
-      toPreview.map((u) => previewRecipeUrl(u, source)),
-    );
-    const out: Result[] = [];
     const failures: string[] = [];
-    previews.forEach((p, i) => {
-      if (p.status === "fulfilled" && p.value) {
-        out.push(p.value);
-      } else if (p.status === "fulfilled") {
-        failures.push(`null-preview:${toPreview[i]}`);
-      } else {
-        failures.push(`rejected:${toPreview[i]}:${String(p.reason).slice(0, 80)}`);
-      }
-    });
-    console.error(
-      `[search-recipes] preview ${source} (${domain}) -> ${out.length}/${toPreview.length} succeeded, failures=[${failures.slice(0, 5).join(" | ")}]`,
+    await Promise.all(
+      toPreview.map(async (u) => {
+        try {
+          const r = await previewRecipeUrl(u, source);
+          if (r) collected.push(r);
+          else failures.push(`null-preview:${u}`);
+        } catch (e) {
+          failures.push(`rejected:${u}:${String(e).slice(0, 80)}`);
+        }
+      }),
     );
-    return out;
+    console.error(
+      `[search-recipes] preview ${source} (${domain}) -> ${collected.length}/${toPreview.length} succeeded, failures=[${failures.slice(0, 5).join(" | ")}]`,
+    );
+    return collected;
   })();
 
   const timeout = new Promise<Result[]>((resolve) =>
     setTimeout(() => {
-      console.error(`[search-recipes] ai deadline ${domain}`);
-      resolve([]);
+      console.error(
+        `[search-recipes] ai deadline ${domain} -> returning ${collected.length}/${toPreviewCount} partial results`,
+      );
+      resolve(collected.slice());
     }, AI_SITE_DEADLINE_MS),
   );
 
@@ -497,7 +503,7 @@ async function searchViaAiAndPreview(
     return await Promise.race([work, timeout]);
   } catch (e) {
     console.error(`[search-recipes] ai search ${domain} error`, e);
-    return [];
+    return collected.slice();
   }
 }
 
