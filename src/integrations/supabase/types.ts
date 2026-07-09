@@ -74,6 +74,134 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_recipes: {
+        Row: {
+          created_at: string
+          description: string
+          emoji: string
+          id: string
+          image_url: string | null
+          ingredients: Json
+          servings: number
+          source_url: string | null
+          steps: string[]
+          tags: string[]
+          title: string
+          total_minutes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          servings?: number
+          source_url?: string | null
+          steps?: string[]
+          tags?: string[]
+          title: string
+          total_minutes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          emoji?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          servings?: number
+          source_url?: string | null
+          steps?: string[]
+          tags?: string[]
+          title?: string
+          total_minutes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_shopping_items: {
+        Row: {
+          aisle: string
+          checked: boolean
+          created_at: string
+          emoji: string
+          id: string
+          name: string
+          quantity: number
+          recipe_id: string | null
+          recipe_title: string
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          aisle?: string
+          checked?: boolean
+          created_at?: string
+          emoji?: string
+          id?: string
+          name: string
+          quantity?: number
+          recipe_id?: string | null
+          recipe_title?: string
+          unit?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          aisle?: string
+          checked?: boolean
+          created_at?: string
+          emoji?: string
+          id?: string
+          name?: string
+          quantity?: number
+          recipe_id?: string | null
+          recipe_title?: string
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_shopping_items_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "user_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

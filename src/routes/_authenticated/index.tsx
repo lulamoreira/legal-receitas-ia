@@ -4,8 +4,9 @@ import { Search, Sparkles, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { RecipeCard } from "@/components/RecipeCard";
+import { UserMenu } from "@/components/UserMenu";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   component: Index,
 });
 
@@ -32,7 +33,7 @@ function Index() {
       {!hydrated && (
         <div className="sr-only" aria-live="polite">Carregando receitas…</div>
       )}
-      <header className="mb-6 flex items-center gap-4">
+      <header className="mb-6 flex items-start gap-3">
         <img
           src="/favicon.png"
           alt="Caderno de Vó"
@@ -40,7 +41,7 @@ function Index() {
           height={64}
           className="h-16 w-16 shrink-0 drop-shadow-sm"
         />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Caderno de Vó</p>
           <h1 className="mt-0.5 font-serif text-[32px] leading-none text-foreground">
             Minhas receitas
@@ -49,6 +50,7 @@ function Index() {
             {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
           </p>
         </div>
+        <UserMenu />
       </header>
 
       {recipes.length >= 3 && (

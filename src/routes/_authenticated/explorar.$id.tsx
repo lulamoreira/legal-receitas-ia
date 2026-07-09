@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import type { Recipe } from "@/lib/types";
 
-export const Route = createFileRoute("/explorar/$id")({
+export const Route = createFileRoute("/_authenticated/explorar/$id")({
   component: CatalogRecipeDetail,
 });
 
@@ -40,11 +40,11 @@ function CatalogRecipeDetail() {
     };
   }, [id]);
 
-  function handleSave() {
+  async function handleSave() {
     if (!recipe) return;
     setSaving(true);
     try {
-      const saved = addRecipe({
+      const saved = await addRecipe({
         title: recipe.title,
         description: recipe.description,
         emoji: recipe.emoji,
@@ -56,6 +56,9 @@ function CatalogRecipeDetail() {
       });
       toast.success("Receita salva nas suas receitas!");
       navigate({ to: "/receita/$id", params: { id: saved.id } });
+    } catch (e) {
+      console.error(e);
+      toast.error("Não consegui salvar. Tente de novo.");
     } finally {
       setSaving(false);
     }

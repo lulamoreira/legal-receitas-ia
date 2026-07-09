@@ -6,7 +6,7 @@ import { RecipeCard } from "@/components/RecipeCard";
 import { CATALOG_PAGE_SIZE, fetchCatalogPage } from "@/lib/catalog";
 import type { Recipe } from "@/lib/types";
 
-export const Route = createFileRoute("/explorar")({
+export const Route = createFileRoute("/_authenticated/explorar")({
   component: Explorar,
 });
 

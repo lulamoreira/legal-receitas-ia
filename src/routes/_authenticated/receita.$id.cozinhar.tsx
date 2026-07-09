@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
 
-export const Route = createFileRoute("/receita/$id/cozinhar")({
+export const Route = createFileRoute("/_authenticated/receita/$id/cozinhar")({
   component: CookMode,
 });
 
