@@ -28,6 +28,7 @@ async function fetchHtml(url: string): Promise<string | null> {
       },
       redirect: "follow",
     });
+    console.error(`[search-recipes] fetchHtml ${url} -> status ${res.status}`);
     if (!res.ok || !res.body) return null;
     const reader = res.body.getReader();
     const decoder = new TextDecoder("utf-8", { fatal: false });
@@ -46,13 +47,16 @@ async function fetchHtml(url: string): Promise<string | null> {
       }
     }
     text += decoder.decode();
+    console.error(`[search-recipes] fetchHtml ${url} -> ${received} bytes`);
     return text;
-  } catch {
+  } catch (e) {
+    console.error(`[search-recipes] fetchHtml ${url} -> error`, e);
     return null;
   } finally {
     clearTimeout(timer);
   }
 }
+
 
 function decodeEntities(s: string): string {
   return s
@@ -93,18 +97,26 @@ function parseTudoGostoso(html: string, ingredient: string): Result[] {
   while ((m = anchorRe.exec(html))) {
     const href = m[1];
     const inner = m[2];
+    const anchorStart = m.index;
     const url = absUrl(href, base);
     if (!url) continue;
     if (seen.has(url)) continue;
-    // Find image in inner
+    // Thumbnail lives BEFORE the anchor as a sibling <img>, not inside it.
+    // Scan the ~1500 chars preceding the anchor for the last matching <img>.
     let thumb: string | null = null;
-    const imgMatch = inner.match(/<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i);
-    if (imgMatch) {
+    const windowStart = Math.max(0, anchorStart - 1500);
+    const before = html.slice(windowStart, anchorStart);
+    const imgRe = /<img\b[^>]*?(?:src|data-src)=["']([^"']+)["'][^>]*>/gi;
+    let imgMatch: RegExpExecArray | null;
+    let lastSrc: string | null = null;
+    while ((imgMatch = imgRe.exec(before))) {
       const src = imgMatch[1];
-      if (/145-110|300x300/.test(src) && !/40x40/.test(src)) {
-        thumb = src;
+      if (/145-110/.test(src) && !/40x40/.test(src)) {
+        lastSrc = src;
       }
     }
+    if (lastSrc) thumb = lastSrc;
+
     let title = stripTags(inner);
     if (!title) {
       const altMatch = inner.match(/alt=["']([^"']+)["']/i);
@@ -114,6 +126,7 @@ function parseTudoGostoso(html: string, ingredient: string): Result[] {
     seen.add(url);
     out.push({ title, url, thumbnailUrl: thumb, source: "TudoGostoso" });
   }
+
   const needle = normalize(ingredient);
   return out.filter((r) => normalize(r.title).includes(needle));
 }
@@ -123,8 +136,10 @@ function parseGuiaDaCozinha(html: string, ingredient: string): Result[] {
   const out: Result[] = [];
   const seen = new Set<string>();
   const anchorRe = /<a\b[^>]*href=["']([^"']*guiadacozinha\.com\.br\/receitas\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  let matchCount = 0;
   let m: RegExpExecArray | null;
   while ((m = anchorRe.exec(html))) {
+    matchCount++;
     const href = m[1];
     const inner = m[2];
     const attrs = m[0];
@@ -146,9 +161,13 @@ function parseGuiaDaCozinha(html: string, ingredient: string): Result[] {
     seen.add(url);
     out.push({ title, url, thumbnailUrl: thumb, source: "Guia da Cozinha" });
   }
+  console.error(
+    `[search-recipes] guiadacozinha html=${html.length} bytes, anchor matches=${matchCount}, pre-filter results=${out.length}`,
+  );
   const needle = normalize(ingredient);
   return out.filter((r) => normalize(r.title).includes(needle));
 }
+
 
 export const Route = createFileRoute("/api/search-recipes-by-ingredient")({
   server: {
