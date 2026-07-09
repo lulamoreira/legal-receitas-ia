@@ -28,6 +28,7 @@ async function fetchHtml(url: string): Promise<string | null> {
       },
       redirect: "follow",
     });
+    console.error(`[search-recipes] fetchHtml ${url} -> status ${res.status}`);
     if (!res.ok || !res.body) return null;
     const reader = res.body.getReader();
     const decoder = new TextDecoder("utf-8", { fatal: false });
@@ -46,13 +47,16 @@ async function fetchHtml(url: string): Promise<string | null> {
       }
     }
     text += decoder.decode();
+    console.error(`[search-recipes] fetchHtml ${url} -> ${received} bytes`);
     return text;
-  } catch {
+  } catch (e) {
+    console.error(`[search-recipes] fetchHtml ${url} -> error`, e);
     return null;
   } finally {
     clearTimeout(timer);
   }
 }
+
 
 function decodeEntities(s: string): string {
   return s
