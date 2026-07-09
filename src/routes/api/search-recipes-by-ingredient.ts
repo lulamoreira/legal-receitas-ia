@@ -101,7 +101,7 @@ function parseTudoGostoso(html: string, ingredient: string): Result[] {
     const imgMatch = inner.match(/<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i);
     if (imgMatch) {
       const src = imgMatch[1];
-      if (/145-110|300x300|receitas\//.test(src) && !/40x40/.test(src)) {
+      if (/145-110|300x300/.test(src) && !/40x40/.test(src)) {
         thumb = src;
       }
     }
