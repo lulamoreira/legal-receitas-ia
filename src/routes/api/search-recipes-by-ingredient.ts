@@ -456,14 +456,33 @@ async function searchViaAiAndPreview(
 ): Promise<Result[]> {
   const work = (async () => {
     const urls = await findRecipeUrlsViaAi(apiKey, domain, ingredient, 3);
-    if (urls.length === 0) return [] as Result[];
+    if (urls.length === 0) {
+      console.error(
+        `[search-recipes] preview ${source} (${domain}) -> 0 URLs from AI, skipping preview`,
+      );
+      return [] as Result[];
+    }
+    const toPreview = urls.slice(0, 5);
+    console.error(
+      `[search-recipes] preview ${source} (${domain}) -> attempting ${toPreview.length} URLs: ${toPreview.join(" , ")}`,
+    );
     const previews = await Promise.allSettled(
-      urls.slice(0, 5).map((u) => previewRecipeUrl(u, source)),
+      toPreview.map((u) => previewRecipeUrl(u, source)),
     );
     const out: Result[] = [];
-    for (const p of previews) {
-      if (p.status === "fulfilled" && p.value) out.push(p.value);
-    }
+    const failures: string[] = [];
+    previews.forEach((p, i) => {
+      if (p.status === "fulfilled" && p.value) {
+        out.push(p.value);
+      } else if (p.status === "fulfilled") {
+        failures.push(`null-preview:${toPreview[i]}`);
+      } else {
+        failures.push(`rejected:${toPreview[i]}:${String(p.reason).slice(0, 80)}`);
+      }
+    });
+    console.error(
+      `[search-recipes] preview ${source} (${domain}) -> ${out.length}/${toPreview.length} succeeded, failures=[${failures.slice(0, 5).join(" | ")}]`,
+    );
     return out;
   })();
 
