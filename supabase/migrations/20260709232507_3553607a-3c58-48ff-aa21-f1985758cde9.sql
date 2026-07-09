@@ -1,0 +1,1 @@
+ALTER TABLE public.user_recipes ADD COLUMN IF NOT EXISTS is_favorite boolean NOT NULL DEFAULT false;

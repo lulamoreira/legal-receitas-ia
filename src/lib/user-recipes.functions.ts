@@ -47,9 +47,30 @@ function rowToRecipe(row: any) {
     steps: (row.steps ?? []) as string[],
     sourceUrl: (row.source_url ?? undefined) as string | undefined,
     imageUrl: (row.image_url ?? undefined) as string | undefined,
+    isFavorite: Boolean(row.is_favorite),
     createdAt: new Date(row.created_at).getTime(),
   };
 }
+
+export const toggleFavoriteRecipe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: cur, error: e1 } = await context.supabase
+      .from("user_recipes")
+      .select("is_favorite")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (e1) throw new Error(e1.message);
+    if (!cur) throw new Error("Receita não encontrada");
+    const next = !cur.is_favorite;
+    const { error: e2 } = await context.supabase
+      .from("user_recipes")
+      .update({ is_favorite: next })
+      .eq("id", data.id);
+    if (e2) throw new Error(e2.message);
+    return { isFavorite: next };
+  });
 
 export const listUserRecipes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

@@ -1,10 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Search, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useHydrated } from "@/hooks/use-hydrated";
-import { RecipeCard } from "@/components/RecipeCard";
 import { UserMenu } from "@/components/UserMenu";
+import {
+  CATEGORIES,
+  matchesCategory,
+  normalize,
+  type CategorySlug,
+} from "@/lib/categories";
+import { fetchCatalogPage, CATALOG_PAGE_SIZE } from "@/lib/catalog";
+import type { Recipe } from "@/lib/types";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
@@ -13,20 +19,61 @@ export const Route = createFileRoute("/_authenticated/")({
 function Index() {
   const hydrated = useHydrated();
   const recipes = useStore((s) => s.recipes);
-  const [q, setQ] = useState("");
+  const [catalog, setCatalog] = useState<Recipe[]>([]);
 
-  const filtered = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    if (!term) return recipes;
-    return recipes.filter((r) => {
-      if (r.title.toLowerCase().includes(term)) return true;
-      if (r.tags.some((t) => t.toLowerCase().includes(term))) return true;
-      if (r.ingredients.some((i) => i.name.toLowerCase().includes(term))) return true;
-      return false;
-    });
-  }, [recipes, q]);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const all: Recipe[] = [];
+        let page = 0;
+        while (page < 10) {
+          const res = await fetchCatalogPage(page);
+          all.push(...res.recipes);
+          if (all.length >= res.total || res.recipes.length < CATALOG_PAGE_SIZE) break;
+          page++;
+        }
+        if (alive) setCatalog(all);
+      } catch (e) {
+        console.error("[home] catalog count", e);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const counts = useMemo(() => {
+    const mineTitles = new Set(recipes.map((r) => normalize(r.title)));
+    const map: Record<CategorySlug, number> = {
+      minhas: 0,
+      favoritas: 0,
+      doces: 0,
+      salgadas: 0,
+      rapidas: 0,
+    };
+    for (const cat of CATEGORIES) {
+      const mineHits = recipes.filter((r) => matchesCategory(r, cat.slug, true)).length;
+      let catalogHits = 0;
+      if (cat.slug === "doces" || cat.slug === "salgadas" || cat.slug === "rapidas") {
+        catalogHits = catalog.filter(
+          (r) => matchesCategory(r, cat.slug, false) && !mineTitles.has(normalize(r.title)),
+        ).length;
+      }
+      map[cat.slug] = mineHits + catalogHits;
+    }
+    return map;
+  }, [recipes, catalog]);
 
   const latest = recipes.slice(0, 5);
+
+  const PASTELS = [
+    { bg: "#FFE3EC", fg: "#7B2547" },
+    { bg: "#FFF0C7", fg: "#6B4A06" },
+    { bg: "#DFF5E9", fg: "#14532D" },
+    { bg: "#EDE7FB", fg: "#3B2E6B" },
+    { bg: "#FFD9C2", fg: "#7A2E10" },
+  ];
 
   return (
     <div className="px-4 pt-8 pb-6">
@@ -43,17 +90,14 @@ function Index() {
         />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Caderno de Vó</p>
-          <h1 className="mt-0.5 font-serif text-[32px] leading-none text-foreground">
-            Minhas receitas
+          <h1 className="mt-0.5 font-serif text-[28px] leading-tight text-foreground">
+            O que vamos cozinhar hoje?
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {recipes.length} {recipes.length === 1 ? "receita salva" : "receitas salvas"}
-          </p>
         </div>
         <UserMenu />
       </header>
 
-      {recipes.length >= 3 && (
+      {latest.length > 0 && (
         <section className="mb-6">
           <div className="mb-2 flex items-baseline justify-between">
             <h2 className="font-serif text-lg text-foreground">Últimas receitas</h2>
@@ -90,57 +134,38 @@ function Index() {
         </section>
       )}
 
-      {recipes.length > 0 && (
-        <div className="sticky top-2 z-10 mb-5">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar por nome, tag ou ingrediente"
-              className="w-full rounded-full border border-border bg-card/95 py-2.5 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground shadow-sm backdrop-blur transition focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 supports-[backdrop-filter]:bg-card/80"
-            />
-            {q && (
-              <button
-                onClick={() => setQ("")}
-                className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                aria-label="Limpar busca"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {filtered.length === 0 ? (
-        <div className="rounded-3xl bg-card p-8 text-center shadow-[var(--shadow-soft)]">
-          <div className="mb-3 text-5xl" aria-hidden>{q ? "🔎" : "🍽️"}</div>
-          <h2 className="font-serif text-lg text-foreground">
-            {q ? "Nada encontrado" : "Nada por aqui ainda"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {q
-              ? "Nenhuma receita bate com a sua busca."
-              : "Cole a legenda do próximo Reel e comece."}
-          </p>
-          {!q && (
-            <Link
-              to="/importar"
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-soft)] transition hover:opacity-90"
-            >
-              <Sparkles className="h-4 w-4" />
-              Importar receita
-            </Link>
-          )}
-        </div>
-      ) : (
+      <section>
+        <h2 className="mb-3 font-serif text-lg text-foreground">Categorias</h2>
         <div className="grid grid-cols-2 gap-3">
-          {filtered.map((r, i) => (
-            <RecipeCard key={r.id} recipe={r} index={i} />
-          ))}
+          {CATEGORIES.map((cat, i) => {
+            const p = PASTELS[i % PASTELS.length]!;
+            const count = counts[cat.slug];
+            return (
+              <Link
+                key={cat.slug}
+                to="/categoria/$slug"
+                params={{ slug: cat.slug }}
+                className="group relative overflow-hidden rounded-3xl p-4 shadow-[var(--shadow-soft)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[var(--shadow-warm)] focus-visible:-translate-y-0.5"
+                style={{ backgroundColor: p.bg }}
+              >
+                <div className="text-4xl" aria-hidden>{cat.emoji}</div>
+                <h3
+                  className="mt-3 font-serif text-lg font-bold leading-tight"
+                  style={{ color: p.fg }}
+                >
+                  {cat.label}
+                </h3>
+                <p
+                  className="mt-0.5 text-xs font-medium"
+                  style={{ color: p.fg, opacity: 0.75 }}
+                >
+                  {count} {count === 1 ? "receita" : "receitas"}
+                </p>
+              </Link>
+            );
+          })}
         </div>
-      )}
+      </section>
     </div>
   );
 }

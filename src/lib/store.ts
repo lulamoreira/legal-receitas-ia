@@ -5,6 +5,7 @@ import {
   createUserRecipe,
   deleteUserRecipe,
   bulkImportUserRecipes,
+  toggleFavoriteRecipe,
 } from "./user-recipes.functions";
 import {
   listShoppingItems,
@@ -23,6 +24,7 @@ type State = {
   reset: () => void;
   addRecipe: (r: ExtractedRecipe) => Promise<Recipe>;
   deleteRecipe: (id: string) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
   addRecipeToShoppingList: (recipeId: string, servings?: number) => Promise<void>;
   toggleItem: (id: string) => Promise<void>;
   clearChecked: () => Promise<void>;
@@ -74,6 +76,22 @@ export const useStore = create<State>()((set, get) => ({
     } catch (e) {
       set({ recipes: prevRecipes, shoppingList: prevList });
       throw e;
+    }
+  },
+
+  toggleFavorite: async (id) => {
+    const prev = get().recipes;
+    const idx = prev.findIndex((r) => r.id === id);
+    if (idx < 0) return;
+    const nextFav = !prev[idx]!.isFavorite;
+    const next = [...prev];
+    next[idx] = { ...prev[idx]!, isFavorite: nextFav };
+    set({ recipes: next });
+    try {
+      await toggleFavoriteRecipe({ data: { id } });
+    } catch (e) {
+      console.error("[toggleFavorite]", e);
+      set({ recipes: prev });
     }
   },
 

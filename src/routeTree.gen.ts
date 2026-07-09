@@ -21,6 +21,7 @@ import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedComprasRouteImport } from './routes/_authenticated/compras'
 import { Route as AuthenticatedReceitaIdRouteImport } from './routes/_authenticated/receita.$id'
 import { Route as AuthenticatedExplorarIdRouteImport } from './routes/_authenticated/explorar.$id'
+import { Route as AuthenticatedCategoriaSlugRouteImport } from './routes/_authenticated/categoria.$slug'
 import { Route as AuthenticatedReceitaIdCozinharRouteImport } from './routes/_authenticated/receita.$id.cozinhar'
 
 const AuthRoute = AuthRouteImport.update({
@@ -83,6 +84,12 @@ const AuthenticatedExplorarIdRoute = AuthenticatedExplorarIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedExplorarRoute,
 } as any)
+const AuthenticatedCategoriaSlugRoute =
+  AuthenticatedCategoriaSlugRouteImport.update({
+    id: '/categoria/$slug',
+    path: '/categoria/$slug',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReceitaIdCozinharRoute =
   AuthenticatedReceitaIdCozinharRouteImport.update({
     id: '/cozinhar',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
   '/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
   '/': typeof AuthenticatedIndexRoute
+  '/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
   '/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
@@ -130,6 +139,7 @@ export interface FileRoutesById {
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/_authenticated/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/_authenticated/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
   '/_authenticated/receita/$id/cozinhar': typeof AuthenticatedReceitaIdCozinharRoute
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/categoria/$slug'
     | '/explorar/$id'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
     | '/'
+    | '/categoria/$slug'
     | '/explorar/$id'
     | '/receita/$id'
     | '/receita/$id/cozinhar'
@@ -175,6 +187,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
     | '/_authenticated/'
+    | '/_authenticated/categoria/$slug'
     | '/_authenticated/explorar/$id'
     | '/_authenticated/receita/$id'
     | '/_authenticated/receita/$id/cozinhar'
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExplorarIdRouteImport
       parentRoute: typeof AuthenticatedExplorarRoute
     }
+    '/_authenticated/categoria/$slug': {
+      id: '/_authenticated/categoria/$slug'
+      path: '/categoria/$slug'
+      fullPath: '/categoria/$slug'
+      preLoaderRoute: typeof AuthenticatedCategoriaSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/receita/$id/cozinhar': {
       id: '/_authenticated/receita/$id/cozinhar'
       path: '/cozinhar'
@@ -317,6 +337,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedExplorarRoute: typeof AuthenticatedExplorarRouteWithChildren
   AuthenticatedImportarRoute: typeof AuthenticatedImportarRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCategoriaSlugRoute: typeof AuthenticatedCategoriaSlugRoute
   AuthenticatedReceitaIdRoute: typeof AuthenticatedReceitaIdRouteWithChildren
 }
 
@@ -325,6 +346,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedExplorarRoute: AuthenticatedExplorarRouteWithChildren,
   AuthenticatedImportarRoute: AuthenticatedImportarRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCategoriaSlugRoute: AuthenticatedCategoriaSlugRoute,
   AuthenticatedReceitaIdRoute: AuthenticatedReceitaIdRouteWithChildren,
 }
 
