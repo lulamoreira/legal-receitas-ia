@@ -17,6 +17,7 @@ import { Route as ApiSearchRecipesByIngredientRouteImport } from './routes/api/s
 import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
 import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
 import { Route as ApiExtractRecipeRouteImport } from './routes/api/extract-recipe'
+import { Route as ApiDishDetailsRouteImport } from './routes/api/dish-details'
 import { Route as AuthenticatedImportarRouteImport } from './routes/_authenticated/importar'
 import { Route as AuthenticatedExplorarRouteImport } from './routes/_authenticated/explorar'
 import { Route as AuthenticatedComprasRouteImport } from './routes/_authenticated/compras'
@@ -65,6 +66,11 @@ const ApiExtractRecipeRoute = ApiExtractRecipeRouteImport.update({
   path: '/api/extract-recipe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDishDetailsRoute = ApiDishDetailsRouteImport.update({
+  id: '/api/dish-details',
+  path: '/api/dish-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedImportarRoute = AuthenticatedImportarRouteImport.update({
   id: '/importar',
   path: '/importar',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/compras': typeof AuthenticatedComprasRoute
   '/explorar': typeof AuthenticatedExplorarRouteWithChildren
   '/importar': typeof AuthenticatedImportarRoute
+  '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/compras': typeof AuthenticatedComprasRoute
   '/explorar': typeof AuthenticatedExplorarRouteWithChildren
   '/importar': typeof AuthenticatedImportarRoute
+  '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/_authenticated/compras': typeof AuthenticatedComprasRoute
   '/_authenticated/explorar': typeof AuthenticatedExplorarRouteWithChildren
   '/_authenticated/importar': typeof AuthenticatedImportarRoute
+  '/api/dish-details': typeof ApiDishDetailsRoute
   '/api/extract-recipe': typeof ApiExtractRecipeRoute
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/compras'
     | '/explorar'
     | '/importar'
+    | '/api/dish-details'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/compras'
     | '/explorar'
     | '/importar'
+    | '/api/dish-details'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/_authenticated/compras'
     | '/_authenticated/explorar'
     | '/_authenticated/importar'
+    | '/api/dish-details'
     | '/api/extract-recipe'
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
@@ -208,6 +220,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiDishDetailsRoute: typeof ApiDishDetailsRoute
   ApiExtractRecipeRoute: typeof ApiExtractRecipeRoute
   ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       path: '/api/extract-recipe'
       fullPath: '/api/extract-recipe'
       preLoaderRoute: typeof ApiExtractRecipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/dish-details': {
+      id: '/api/dish-details'
+      path: '/api/dish-details'
+      fullPath: '/api/dish-details'
+      preLoaderRoute: typeof ApiDishDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/importar': {
@@ -376,6 +396,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiDishDetailsRoute: ApiDishDetailsRoute,
   ApiExtractRecipeRoute: ApiExtractRecipeRoute,
   ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
