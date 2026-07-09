@@ -141,12 +141,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background pb-28">
+      <div
+        className="min-h-screen bg-background"
+        style={{ paddingBottom: "calc(7rem + env(safe-area-inset-bottom))" }}
+      >
         <div className="mx-auto max-w-md">
           <Outlet />
         </div>
         <BottomNav />
-        <Toaster position="top-center" richColors />
+        <Toaster position="top-center" richColors closeButton />
       </div>
     </QueryClientProvider>
   );
