@@ -35,6 +35,7 @@ export type Recipe = {
   steps: string[];
   sourceUrl?: string;
   imageUrl?: string;
+  isFavorite?: boolean;
   createdAt: number;
 };
 
