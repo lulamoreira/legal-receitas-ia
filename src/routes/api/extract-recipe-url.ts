@@ -282,7 +282,7 @@ export const Route = createFileRoute("/api/extract-recipe-url")({
           const html = await fetchHtml(parsedUrl.toString());
           if (!html) {
             return Response.json(
-              { error: "Não consegui acessar essa página." },
+              { error: "Não consegui abrir esse link. Confira o endereço e tente de novo." },
               { status: 502 },
             );
           }
