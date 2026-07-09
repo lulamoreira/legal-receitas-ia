@@ -271,36 +271,64 @@ async function findRecipeUrlsViaAi(
     | { choices?: Array<{ message?: { content?: string } }> }
     | null;
   const content = payload?.choices?.[0]?.message?.content ?? "";
-  if (!content) return [];
+  if (!content) {
+    console.error(`[search-recipes] ai ${domain} -> empty content`);
+    return [];
+  }
 
   let arr: unknown;
   try {
     arr = JSON.parse(extractJson(content));
   } catch {
-    console.error(`[search-recipes] ai json parse failed for ${domain}`);
+    console.error(
+      `[search-recipes] ai json parse failed for ${domain}. content preview: ${content.slice(0, 300)}`,
+    );
     return [];
   }
-  if (!Array.isArray(arr)) return [];
+  if (!Array.isArray(arr)) {
+    console.error(
+      `[search-recipes] ai ${domain} -> parsed but not array (type=${typeof arr})`,
+    );
+    return [];
+  }
 
+  const rawCount = arr.length;
+  const rejected: string[] = [];
   const urls: string[] = [];
   const seen = new Set<string>();
   for (const item of arr) {
-    if (typeof item !== "string") continue;
+    if (typeof item !== "string") {
+      rejected.push(`non-string:${typeof item}`);
+      continue;
+    }
     let u: URL;
     try {
       u = new URL(item);
     } catch {
+      rejected.push(`invalid-url:${item.slice(0, 80)}`);
       continue;
     }
-    if (u.protocol !== "http:" && u.protocol !== "https:") continue;
+    if (u.protocol !== "http:" && u.protocol !== "https:") {
+      rejected.push(`bad-protocol:${u.protocol}`);
+      continue;
+    }
     const host = u.hostname.toLowerCase();
     // Validação de domínio: hostname deve terminar exatamente em `domain`
-    if (host !== domain && !host.endsWith(`.${domain}`)) continue;
+    if (host !== domain && !host.endsWith(`.${domain}`)) {
+      rejected.push(`host-mismatch:${host}`);
+      continue;
+    }
     const clean = u.toString();
-    if (seen.has(clean)) continue;
+    if (seen.has(clean)) {
+      rejected.push(`duplicate:${host}`);
+      continue;
+    }
     seen.add(clean);
     urls.push(clean);
   }
+  console.error(
+    `[search-recipes] ai ${domain} -> raw=${rawCount}, accepted=${urls.length}, rejected=${rejected.length} [${rejected.slice(0, 5).join(" | ")}]`,
+  );
   return urls;
 }
 
