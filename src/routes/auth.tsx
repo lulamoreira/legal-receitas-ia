@@ -9,9 +9,15 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+type Mode = "signin" | "signup";
+
 function AuthPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  const [mode, setMode] = useState<Mode>("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailBusy, setEmailBusy] = useState(false);
 
   useEffect(() => {
     // If already signed in, bounce to home
@@ -43,8 +49,56 @@ function AuthPage() {
     }
   }
 
+  function friendlyError(msg: string): string {
+    const m = msg.toLowerCase();
+    if (m.includes("already registered") || m.includes("already been registered") || m.includes("user already")) {
+      return "Esse e-mail já tem conta. Tenta entrar em vez de criar uma nova?";
+    }
+    if (m.includes("invalid login") || m.includes("invalid credentials") || m.includes("invalid email or password")) {
+      return "E-mail ou senha incorretos.";
+    }
+    if (m.includes("password") && (m.includes("6") || m.includes("short") || m.includes("at least"))) {
+      return "A senha precisa ter pelo menos 6 caracteres.";
+    }
+    if (m.includes("invalid email") || m.includes("email address")) {
+      return "E-mail inválido.";
+    }
+    return "Algo deu errado. Tenta de novo?";
+  }
+
+  async function submitEmail(e: React.FormEvent) {
+    e.preventDefault();
+    if (password.length < 6) {
+      toast.error("A senha precisa ter pelo menos 6 caracteres.");
+      return;
+    }
+    setEmailBusy(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          toast.error(friendlyError(error.message));
+          setEmailBusy(false);
+          return;
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast.error(friendlyError(error.message));
+          setEmailBusy(false);
+          return;
+        }
+      }
+      // onAuthStateChange redirects
+    } catch (err) {
+      console.error(err);
+      toast.error("Algo deu errado. Tenta de novo?");
+      setEmailBusy(false);
+    }
+  }
+
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6">
+    <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 py-10">
       <div className="w-full rounded-3xl bg-card p-8 shadow-[var(--shadow-warm)]">
         <div className="flex flex-col items-center text-center">
           <img
@@ -61,21 +115,70 @@ function AuthPage() {
             Suas receitas em qualquer lugar
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Entre com o Google pra sincronizar suas receitas e a lista de compras
-            entre celular, tablet e computador.
+            Entre pra sincronizar suas receitas e a lista de compras entre
+            celular, tablet e computador.
           </p>
         </div>
 
         <button
           onClick={signInGoogle}
-          disabled={busy}
+          disabled={busy || emailBusy}
           className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-full border border-border bg-white py-3 text-sm font-semibold text-[#3c4043] shadow-sm transition hover:bg-gray-50 disabled:opacity-60"
         >
           <GoogleIcon />
           {busy ? "Entrando…" : "Entrar com Google"}
         </button>
 
-        <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">ou</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+
+        <form onSubmit={submitEmail} className="flex flex-col gap-3">
+          <input
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={emailBusy || busy}
+            className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm outline-none ring-primary/40 focus:ring-2 disabled:opacity-60"
+          />
+          <input
+            type="password"
+            required
+            minLength={6}
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            placeholder="Senha (mín. 6 caracteres)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={emailBusy || busy}
+            className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm outline-none ring-primary/40 focus:ring-2 disabled:opacity-60"
+          />
+          <button
+            type="submit"
+            disabled={emailBusy || busy}
+            className="mt-1 inline-flex w-full items-center justify-center rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+          >
+            {emailBusy
+              ? mode === "signup" ? "Criando conta…" : "Entrando…"
+              : mode === "signup" ? "Criar conta" : "Entrar"}
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            {mode === "signup" ? "Já tem conta? Entrar" : "Não tem conta? Criar conta"}
+          </button>
+        </div>
+
+        <p className="mt-6 text-center text-[11px] leading-relaxed text-muted-foreground">
           Ao entrar, você concorda em salvar suas receitas na nuvem para acessar
           de qualquer dispositivo.
         </p>
