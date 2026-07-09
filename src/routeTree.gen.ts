@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as ApiSuggestDishesRouteImport } from './routes/api/suggest-dishes'
 import { Route as ApiSearchRecipesByIngredientRouteImport } from './routes/api/search-recipes-by-ingredient'
 import { Route as ApiExtractRecipeVideoRouteImport } from './routes/api/extract-recipe-video'
 import { Route as ApiExtractRecipeUrlRouteImport } from './routes/api/extract-recipe-url'
@@ -37,6 +38,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiSuggestDishesRoute = ApiSuggestDishesRouteImport.update({
+  id: '/api/suggest-dishes',
+  path: '/api/suggest-dishes',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSearchRecipesByIngredientRoute =
   ApiSearchRecipesByIngredientRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/api/suggest-dishes': typeof ApiSuggestDishesRoute
   '/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
   '/receita/$id': typeof AuthenticatedReceitaIdRouteWithChildren
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/api/suggest-dishes': typeof ApiSuggestDishesRoute
   '/': typeof AuthenticatedIndexRoute
   '/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/explorar/$id': typeof AuthenticatedExplorarIdRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/api/extract-recipe-url': typeof ApiExtractRecipeUrlRoute
   '/api/extract-recipe-video': typeof ApiExtractRecipeVideoRoute
   '/api/search-recipes-by-ingredient': typeof ApiSearchRecipesByIngredientRoute
+  '/api/suggest-dishes': typeof ApiSuggestDishesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/categoria/$slug': typeof AuthenticatedCategoriaSlugRoute
   '/_authenticated/explorar/$id': typeof AuthenticatedExplorarIdRoute
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/api/suggest-dishes'
     | '/categoria/$slug'
     | '/explorar/$id'
     | '/receita/$id'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/api/suggest-dishes'
     | '/'
     | '/categoria/$slug'
     | '/explorar/$id'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/api/extract-recipe-url'
     | '/api/extract-recipe-video'
     | '/api/search-recipes-by-ingredient'
+    | '/api/suggest-dishes'
     | '/_authenticated/'
     | '/_authenticated/categoria/$slug'
     | '/_authenticated/explorar/$id'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   ApiExtractRecipeUrlRoute: typeof ApiExtractRecipeUrlRoute
   ApiExtractRecipeVideoRoute: typeof ApiExtractRecipeVideoRoute
   ApiSearchRecipesByIngredientRoute: typeof ApiSearchRecipesByIngredientRoute
+  ApiSuggestDishesRoute: typeof ApiSuggestDishesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/suggest-dishes': {
+      id: '/api/suggest-dishes'
+      path: '/api/suggest-dishes'
+      fullPath: '/api/suggest-dishes'
+      preLoaderRoute: typeof ApiSuggestDishesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/search-recipes-by-ingredient': {
       id: '/api/search-recipes-by-ingredient'
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiExtractRecipeUrlRoute: ApiExtractRecipeUrlRoute,
   ApiExtractRecipeVideoRoute: ApiExtractRecipeVideoRoute,
   ApiSearchRecipesByIngredientRoute: ApiSearchRecipesByIngredientRoute,
+  ApiSuggestDishesRoute: ApiSuggestDishesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
