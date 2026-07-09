@@ -106,6 +106,7 @@ export type Database = {
           id: string
           image_url: string | null
           ingredients: Json
+          is_favorite: boolean
           servings: number
           source_url: string | null
           steps: string[]
@@ -122,6 +123,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           ingredients?: Json
+          is_favorite?: boolean
           servings?: number
           source_url?: string | null
           steps?: string[]
@@ -138,6 +140,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           ingredients?: Json
+          is_favorite?: boolean
           servings?: number
           source_url?: string | null
           steps?: string[]
