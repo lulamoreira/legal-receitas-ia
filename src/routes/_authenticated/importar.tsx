@@ -141,12 +141,17 @@ function Importar() {
     xhr.send(form);
   }
 
-  function save() {
+  async function save() {
     if (!preview) return;
     const cleanUrl = sanitizeHttpUrl(preview.sourceUrl);
-    const recipe = addRecipe({ ...preview, sourceUrl: cleanUrl });
-    toast.success("Receita salva!");
-    navigate({ to: "/receita/$id", params: { id: recipe.id } });
+    try {
+      const recipe = await addRecipe({ ...preview, sourceUrl: cleanUrl });
+      toast.success("Receita salva!");
+      navigate({ to: "/receita/$id", params: { id: recipe.id } });
+    } catch (e) {
+      console.error(e);
+      toast.error("Não consegui salvar essa receita.");
+    }
   }
 
   function sanitizeHttpUrl(u: string | undefined): string | undefined {
