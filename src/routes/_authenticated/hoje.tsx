@@ -508,7 +508,7 @@ function HojeRoute() {
                 <div className="flex flex-wrap gap-2">
                   {detectedProteins.length === 0 ? (
                     PROTEIN_CHIPS.map((p) => (
-                      <Chip key={p} onClick={() => selectProtein(p === "Nenhuma" ? "" : p)}>{p}</Chip>
+                      <Chip key={p} onClick={() => selectProtein(p === "Nenhuma" ? "" : p, p)}>{p}</Chip>
                     ))
                   ) : (
                     <>
