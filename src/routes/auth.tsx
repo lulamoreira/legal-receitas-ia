@@ -28,11 +28,6 @@ function AuthPage() {
     const hasCode = /[?&]code=/.test(search);
     const isOAuthReturn = hasHash || hasCode;
 
-    // TODO: remover após validar em produção
-    if (isOAuthReturn) {
-      console.error("[oauth-return] detected", { hasHash, hasCode });
-    }
-
     let cancelled = false;
 
     async function finalizeOAuth() {
@@ -40,12 +35,7 @@ function AuthPage() {
       const start = Date.now();
       const timeoutMs = 5000;
       while (!cancelled && Date.now() - start < timeoutMs) {
-        const { data, error } = await supabase.auth.getSession();
-        // TODO: remover após validar em produção
-        console.error("[oauth-return] poll", {
-          hasSession: !!data.session,
-          error: error?.message,
-        });
+        const { data } = await supabase.auth.getSession();
         if (data.session) {
           try {
             history.replaceState(null, "", window.location.pathname);
@@ -58,8 +48,6 @@ function AuthPage() {
         await new Promise((r) => setTimeout(r, 250));
       }
       if (!cancelled) {
-        // TODO: remover após validar em produção
-        console.error("[oauth-return] timeout without session");
         toast.error("Não consegui concluir o login com Google. Tente de novo.");
         setFinalizingOAuth(false);
       }
