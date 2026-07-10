@@ -18,23 +18,81 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailBusy, setEmailBusy] = useState(false);
+  const [finalizingOAuth, setFinalizingOAuth] = useState(false);
 
   useEffect(() => {
-    // If already signed in, bounce to home
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/" });
-    });
+    // Detect OAuth return in URL (hash tokens or ?code=)
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const hasHash = hash.includes("access_token=") || hash.includes("type=recovery");
+    const hasCode = /[?&]code=/.test(search);
+    const isOAuthReturn = hasHash || hasCode;
+
+    // TODO: remover após validar em produção
+    if (isOAuthReturn) {
+      console.error("[oauth-return] detected", { hasHash, hasCode });
+    }
+
+    let cancelled = false;
+
+    async function finalizeOAuth() {
+      setFinalizingOAuth(true);
+      const start = Date.now();
+      const timeoutMs = 5000;
+      while (!cancelled && Date.now() - start < timeoutMs) {
+        const { data, error } = await supabase.auth.getSession();
+        // TODO: remover após validar em produção
+        console.error("[oauth-return] poll", {
+          hasSession: !!data.session,
+          error: error?.message,
+        });
+        if (data.session) {
+          try {
+            history.replaceState(null, "", window.location.pathname);
+          } catch (e) {
+            console.error("[oauth-return] replaceState failed", e);
+          }
+          if (!cancelled) navigate({ to: "/" });
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 250));
+      }
+      if (!cancelled) {
+        // TODO: remover após validar em produção
+        console.error("[oauth-return] timeout without session");
+        toast.error("Não consegui concluir o login com Google. Tente de novo.");
+        setFinalizingOAuth(false);
+      }
+    }
+
+    if (isOAuthReturn) {
+      finalizeOAuth();
+    } else {
+      // If already signed in, bounce to home (only when NOT finalizing OAuth)
+      supabase.auth.getUser().then(({ data }) => {
+        if (!cancelled && data.user) navigate({ to: "/" });
+      });
+    }
+
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") navigate({ to: "/" });
+      if (event === "SIGNED_IN") {
+        try {
+          history.replaceState(null, "", window.location.pathname);
+        } catch {}
+        navigate({ to: "/" });
+      }
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   async function signInGoogle() {
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: window.location.origin + "/auth",
       });
       if (result.error) {
         toast.error("Não consegui entrar com o Google. Tente de novo.");
@@ -48,6 +106,7 @@ function AuthPage() {
       setBusy(false);
     }
   }
+
 
   function friendlyError(msg: string): string {
     const m = msg.toLowerCase();
