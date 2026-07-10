@@ -76,7 +76,7 @@ function Index() {
   ];
 
   return (
-    <div className="px-4 pt-8 pb-6">
+    <div className="relative px-4 pt-8 pb-6">
       {!hydrated && (
         <div className="sr-only" aria-live="polite">Carregando receitas…</div>
       )}
