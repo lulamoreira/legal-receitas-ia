@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { AISLES } from "./types";
+import { cleanEmoji } from "./emoji";
 
 const aisleEnum = z.enum(AISLES);
 
@@ -73,11 +74,13 @@ export function sanitizeExtracted(output: z.infer<typeof recipeSchema>) {
   const validAisles = AISLES as readonly string[];
   return {
     ...output,
+    emoji: cleanEmoji(output.emoji, "🍽️"),
     servings: Math.max(1, Math.min(50, Math.round(output.servings || 4))),
     totalMinutes: Math.max(1, Math.min(1440, Math.round(output.totalMinutes || 30))),
     tags: (output.tags || []).slice(0, 4),
     ingredients: (output.ingredients || []).map((i) => ({
       ...i,
+      emoji: cleanEmoji(i.emoji, "🥄"),
       quantity: Number.isFinite(i.quantity) ? Math.max(0, i.quantity) : 0,
       aisle: (validAisles.includes(i.aisle) ? i.aisle : "Outros") as (typeof AISLES)[number],
       note: i.note ?? undefined,
