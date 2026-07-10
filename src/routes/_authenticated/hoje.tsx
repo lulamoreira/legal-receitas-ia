@@ -241,10 +241,6 @@ function HojeRoute() {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  function pushUser(text: string) {
-    push({ role: "user", text, key: `u-${Date.now()}-${Math.random()}` });
-  }
-
   function submitFridge() {
     const v = fridge.trim();
     if (!v) {
@@ -252,11 +248,20 @@ function HojeRoute() {
       return;
     }
     pushUser(v);
+    const detected = detectProteins(v);
+    setDetectedProteins(detected);
     setTimeout(() => {
-      pushVo("Ótimo! Tem alguma proteína aí que você queira usar?");
+      if (detected.length === 1) {
+        pushVo(`Vi que você tem ${detected[0]} — ela vai ser a estrela do prato, piccolino?`);
+      } else if (detected.length >= 2) {
+        pushVo(`Você me falou de ${detected.join(", ")}. Qual vai ser a estrela do prato?`);
+      } else {
+        pushVo("Ótimo! Tem alguma proteína aí que você queira usar?");
+      }
       setStep("protein");
     }, 250);
   }
+
 
   function selectProtein(p: string) {
     setProtein(p);
