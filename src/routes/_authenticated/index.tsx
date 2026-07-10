@@ -82,7 +82,7 @@ function Index() {
       )}
       <header className="mb-6 flex items-start gap-3">
         <img
-          src="/favicon.png"
+          src="/nona-hero.png"
           alt="Nona Neural"
           width={64}
           height={64}
