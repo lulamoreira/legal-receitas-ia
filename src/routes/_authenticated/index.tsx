@@ -122,7 +122,7 @@ function Index() {
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <span aria-hidden>{r.emoji}</span>
+                    <span className="max-w-full truncate px-1 leading-none" aria-hidden>{r.emoji}</span>
                   )}
                 </div>
                 <p className="mt-1.5 line-clamp-2 text-xs font-medium leading-tight text-foreground">

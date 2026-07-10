@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { cleanEmoji } from "@/lib/emoji";
 
 const ingredientSchema = z.object({
   id: z.string().optional(),
@@ -36,13 +37,14 @@ function rowToRecipe(row: any) {
     id: row.id as string,
     title: row.title as string,
     description: (row.description ?? "") as string,
-    emoji: (row.emoji ?? "🍽️") as string,
+    emoji: cleanEmoji(row.emoji, "🍽️"),
     servings: row.servings as number,
     totalMinutes: row.total_minutes as number,
     tags: (row.tags ?? []) as string[],
     ingredients: ((row.ingredients ?? []) as any[]).map((i) => ({
       ...i,
       id: i.id ?? newId(),
+      emoji: cleanEmoji(i.emoji, "🥄"),
     })),
     steps: (row.steps ?? []) as string[],
     sourceUrl: (row.source_url ?? undefined) as string | undefined,
