@@ -225,12 +225,22 @@ function HojeRoute() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [bubbles, step, dishes, detailLoading, details]);
 
+  const [detectedProteins, setDetectedProteins] = useState<string[]>([]);
+
   function push(bubble: Bubble) {
     setBubbles((b) => [...b, bubble]);
   }
   function pushVo(text: string) {
     push({ role: "vo", text, key: `vo-${Date.now()}-${Math.random()}` });
   }
+  function pushUser(text: string) {
+    push({ role: "user", text, key: `u-${Date.now()}-${Math.random()}` });
+  }
+
+  function capitalize(s: string): string {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
   function pushUser(text: string) {
     push({ role: "user", text, key: `u-${Date.now()}-${Math.random()}` });
   }
