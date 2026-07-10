@@ -37,8 +37,8 @@ export function RecipeCard({ recipe, index = 0, to = "/receita/$id" }: RecipeCar
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="grid h-full place-items-center text-6xl" aria-hidden>
-            {recipe.emoji}
+          <div className="grid h-full place-items-center overflow-hidden px-2 text-6xl leading-none" aria-hidden>
+            <span className="max-w-full truncate leading-none">{recipe.emoji}</span>
           </div>
         )}
         {recipe.tags.length > 0 && (

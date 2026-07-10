@@ -454,8 +454,8 @@ function HojeRoute() {
                     className="w-full rounded-3xl bg-card p-4 text-left shadow-[var(--shadow-soft)] transition hover:scale-[1.01] active:scale-[0.99]"
                   >
                     <div className="flex items-start gap-3">
-                      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl" style={{ backgroundColor: "#FFE3EC" }} aria-hidden>
-                        {d.emoji}
+                      <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl text-2xl leading-none" style={{ backgroundColor: "#FFE3EC" }} aria-hidden>
+                        <span className="max-w-full truncate leading-none">{d.emoji}</span>
                       </span>
                       <div className="min-w-0 flex-1">
                         <h3 className="font-serif text-base text-foreground">{d.name}</h3>
@@ -662,8 +662,8 @@ function DetailView({
           <img src={details.imageUrl} alt={details.title} className="aspect-[4/3] w-full object-cover" />
         </div>
       ) : (
-        <div className="grid aspect-[4/3] w-full place-items-center rounded-3xl text-[6rem]" style={{ backgroundColor: "#FFE3EC" }} aria-hidden>
-          {details.emoji || dish.emoji}
+        <div className="grid aspect-[4/3] w-full place-items-center overflow-hidden rounded-3xl px-4 text-[6rem] leading-none" style={{ backgroundColor: "#FFE3EC" }} aria-hidden>
+          <span className="max-w-full truncate leading-none">{details.emoji || dish.emoji}</span>
         </div>
       )}
 

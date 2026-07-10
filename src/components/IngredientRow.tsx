@@ -13,11 +13,11 @@ export function IngredientRow({
   const qty = scaleQuantity(ingredient.quantity, fromServings, toServings);
   return (
     <li className="flex items-start gap-3 border-b border-border/60 py-3 last:border-b-0">
-      <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-accent text-lg" aria-hidden>
+      <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-accent text-lg leading-none" aria-hidden>
         {ingredient.imageUrl ? (
           <img src={ingredient.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
-          ingredient.emoji
+          <span className="max-w-full truncate leading-none">{ingredient.emoji}</span>
         )}
       </span>
 
