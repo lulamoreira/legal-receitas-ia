@@ -505,9 +505,21 @@ function HojeRoute() {
             {step === "protein" && (
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-2">
-                  {PROTEIN_CHIPS.map((p) => (
-                    <Chip key={p} onClick={() => selectProtein(p)}>{p}</Chip>
-                  ))}
+                  {detectedProteins.length === 0 ? (
+                    PROTEIN_CHIPS.map((p) => (
+                      <Chip key={p} onClick={() => selectProtein(p === "Nenhuma" ? "" : p)}>{p}</Chip>
+                    ))
+                  ) : (
+                    <>
+                      {detectedProteins.map((p) => (
+                        <Chip key={p} onClick={() => selectProtein(capitalize(p))}>{capitalize(p)}</Chip>
+                      ))}
+                      {detectedProteins.length >= 2 && (
+                        <Chip onClick={() => selectProtein(detectedProteins.join(", "))}>Todas</Chip>
+                      )}
+                      <Chip onClick={() => selectProtein("")}>Sem proteína hoje</Chip>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -523,6 +535,7 @@ function HojeRoute() {
                 </div>
               </div>
             )}
+
 
             {step === "time" && (
               <div className="flex flex-wrap gap-2">
