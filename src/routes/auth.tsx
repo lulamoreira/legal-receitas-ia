@@ -102,7 +102,7 @@ function AuthPage() {
       <div className="w-full rounded-3xl bg-card p-8 shadow-[var(--shadow-warm)]">
         <div className="flex flex-col items-center text-center">
           <img
-            src="/favicon.png"
+            src="/nona-hero.png"
             alt="Nona Neural"
             width={80}
             height={80}

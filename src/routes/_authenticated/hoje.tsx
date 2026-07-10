@@ -118,11 +118,11 @@ type Bubble = { role: "vo" | "user"; text: string; key: string };
 function VoAvatar() {
   return (
     <div
-      className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg shadow-sm"
+      className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full shadow-sm"
       style={{ backgroundColor: "#FFE3EC" }}
       aria-hidden
     >
-      👵
+      <img src="/nona-avatar.png" alt="" className="h-full w-full rounded-full object-cover" />
     </div>
   );
 }
