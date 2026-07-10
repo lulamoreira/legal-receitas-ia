@@ -26,6 +26,18 @@ function AuthenticatedLayout() {
   const hydrated = useStore((s) => s.hydrated);
   const didInit = useRef(false);
 
+  // Re-hydrate whenever auth state changes (e.g. right after sign-in the
+  // bearer token may not have been persisted on the first hydrate attempt).
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        useStore.setState({ hydrated: false });
+        void hydrate();
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [hydrate]);
+
   useEffect(() => {
     if (didInit.current) return;
     didInit.current = true;
