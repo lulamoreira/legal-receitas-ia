@@ -55,6 +55,64 @@ const RESTRICTION_CHIPS = [
 ];
 const MOOD_CHIPS = ["Leve e saudável", "Rápido", "Econômico", "Especial", "Comida de conforto"];
 
+// Detecta proteínas mencionadas em texto livre. Mantém o rótulo original
+// (com acento/case bonito) para exibir nos chips e enviar ao endpoint.
+const PROTEIN_KEYWORDS: { key: string; label: string }[] = [
+  { key: "carne moida", label: "carne moída" },
+  { key: "carne bovina", label: "carne bovina" },
+  { key: "carne suina", label: "carne suína" },
+  { key: "carne de porco", label: "carne de porco" },
+  { key: "bife", label: "bife" },
+  { key: "boi", label: "boi" },
+  { key: "carne", label: "carne" },
+  { key: "frango", label: "frango" },
+  { key: "peito de frango", label: "peito de frango" },
+  { key: "coxa de frango", label: "coxa de frango" },
+  { key: "peru", label: "peru" },
+  { key: "peixe", label: "peixe" },
+  { key: "salmao", label: "salmão" },
+  { key: "atum", label: "atum" },
+  { key: "tilapia", label: "tilápia" },
+  { key: "sardinha", label: "sardinha" },
+  { key: "bacalhau", label: "bacalhau" },
+  { key: "camarao", label: "camarão" },
+  { key: "ovos", label: "ovos" },
+  { key: "ovo", label: "ovo" },
+  { key: "linguica", label: "linguiça" },
+  { key: "salsicha", label: "salsicha" },
+  { key: "bacon", label: "bacon" },
+  { key: "presunto", label: "presunto" },
+  { key: "porco", label: "porco" },
+  { key: "lombo", label: "lombo" },
+  { key: "costela", label: "costela" },
+];
+
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function detectProteins(text: string): string[] {
+  const norm = normalize(text);
+  const found: { key: string; label: string }[] = [];
+  for (const p of PROTEIN_KEYWORDS) {
+    const re = new RegExp(`(^|[^a-z])${p.key.replace(/ /g, "\\s+")}([^a-z]|$)`);
+    if (re.test(norm)) found.push(p);
+  }
+  // Deduplicar: se um label já detectado contém a chave de outro, remove o menor.
+  const kept: { key: string; label: string }[] = [];
+  for (const p of found) {
+    const isSubsumed = found.some((other) => other !== p && other.key.includes(p.key));
+    if (!isSubsumed) kept.push(p);
+  }
+  // Remove duplicatas exatas por label
+  const seen = new Set<string>();
+  return kept.filter((p) => (seen.has(p.label) ? false : (seen.add(p.label), true))).map((p) => p.label);
+}
+
+
 type Bubble = { role: "vo" | "user"; text: string; key: string };
 
 function VoAvatar() {
@@ -167,6 +225,8 @@ function HojeRoute() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [bubbles, step, dishes, detailLoading, details]);
 
+  const [detectedProteins, setDetectedProteins] = useState<string[]>([]);
+
   function push(bubble: Bubble) {
     setBubbles((b) => [...b, bubble]);
   }
@@ -177,6 +237,10 @@ function HojeRoute() {
     push({ role: "user", text, key: `u-${Date.now()}-${Math.random()}` });
   }
 
+  function capitalize(s: string): string {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
   function submitFridge() {
     const v = fridge.trim();
     if (!v) {
@@ -184,20 +248,30 @@ function HojeRoute() {
       return;
     }
     pushUser(v);
+    const detected = detectProteins(v);
+    setDetectedProteins(detected);
     setTimeout(() => {
-      pushVo("Ótimo! Tem alguma proteína aí que você queira usar?");
+      if (detected.length === 1) {
+        pushVo(`Vi que você tem ${detected[0]} — ela vai ser a estrela do prato, piccolino?`);
+      } else if (detected.length >= 2) {
+        pushVo(`Você me falou de ${detected.join(", ")}. Qual vai ser a estrela do prato?`);
+      } else {
+        pushVo("Ótimo! Tem alguma proteína aí que você queira usar?");
+      }
       setStep("protein");
     }, 250);
   }
 
-  function selectProtein(p: string) {
+
+  function selectProtein(p: string, displayLabel?: string) {
     setProtein(p);
-    pushUser(p);
+    pushUser(displayLabel ?? (p || "Sem proteína hoje"));
     setTimeout(() => {
       pushVo("E quanto tempo você tem, meu bem?");
       setStep("time");
     }, 250);
   }
+
 
   function submitProteinOther() {
     const v = proteinOther.trim();
@@ -432,9 +506,21 @@ function HojeRoute() {
             {step === "protein" && (
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-2">
-                  {PROTEIN_CHIPS.map((p) => (
-                    <Chip key={p} onClick={() => selectProtein(p)}>{p}</Chip>
-                  ))}
+                  {detectedProteins.length === 0 ? (
+                    PROTEIN_CHIPS.map((p) => (
+                      <Chip key={p} onClick={() => selectProtein(p === "Nenhuma" ? "" : p, p)}>{p}</Chip>
+                    ))
+                  ) : (
+                    <>
+                      {detectedProteins.map((p) => (
+                        <Chip key={p} onClick={() => selectProtein(capitalize(p))}>{capitalize(p)}</Chip>
+                      ))}
+                      {detectedProteins.length >= 2 && (
+                        <Chip onClick={() => selectProtein(detectedProteins.join(", "))}>Todas</Chip>
+                      )}
+                      <Chip onClick={() => selectProtein("")}>Sem proteína hoje</Chip>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -450,6 +536,7 @@ function HojeRoute() {
                 </div>
               </div>
             )}
+
 
             {step === "time" && (
               <div className="flex flex-wrap gap-2">
