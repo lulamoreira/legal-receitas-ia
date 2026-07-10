@@ -51,7 +51,9 @@ export const useStore = create<State>()((set, get) => ({
       set({ recipes, shoppingList, hydrated: true, loading: false });
     } catch (e) {
       console.error("[store.hydrate]", e);
-      set({ loading: false });
+      // Never leave the UI stuck on the spinner — mark hydrated even on error
+      // so the app is usable; a retry will happen on the next auth event.
+      set({ hydrated: true, loading: false });
     }
   },
 
