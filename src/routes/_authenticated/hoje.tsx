@@ -263,14 +263,15 @@ function HojeRoute() {
   }
 
 
-  function selectProtein(p: string) {
+  function selectProtein(p: string, displayLabel?: string) {
     setProtein(p);
-    pushUser(p);
+    pushUser(displayLabel ?? (p || "Sem proteína hoje"));
     setTimeout(() => {
       pushVo("E quanto tempo você tem, meu bem?");
       setStep("time");
     }, 250);
   }
+
 
   function submitProteinOther() {
     const v = proteinOther.trim();
