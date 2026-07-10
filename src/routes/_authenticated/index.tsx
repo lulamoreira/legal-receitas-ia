@@ -80,21 +80,21 @@ function Index() {
       {!hydrated && (
         <div className="sr-only" aria-live="polite">Carregando receitas…</div>
       )}
-      <header className="mb-6 flex items-start gap-3">
+      <header className="mb-6 flex flex-col items-center text-center">
         <img
           src="/nona-hero.png"
           alt="Nona Neural"
-          width={64}
-          height={64}
-          className="h-16 w-16 shrink-0 drop-shadow-sm"
+          width={160}
+          height={160}
+          className="h-40 w-40 drop-shadow-sm"
         />
-        <div className="min-w-0 flex-1">
+        <div className="mt-3">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Nona Neural</p>
-          <h1 className="mt-0.5 font-serif text-[28px] leading-tight text-foreground">
+          <h1 className="mt-1 font-serif text-[28px] leading-tight text-foreground">
             O que vamos cozinhar hoje?
           </h1>
         </div>
-        <UserMenu />
+        <div className="absolute right-4 top-8"><UserMenu /></div>
       </header>
 
       {latest.length > 0 && (
