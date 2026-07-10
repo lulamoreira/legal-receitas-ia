@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { getClientIp, rateLimit } from "@/lib/rate-limit.server";
+import { cleanEmoji } from "@/lib/emoji";
 
 const HOUR_MS = 60 * 60 * 1000;
 const AI_MODEL = "google/gemini-2.5-flash";
@@ -138,7 +139,7 @@ Responda APENAS JSON válido neste formato:
 
           const dishes = validated.data.dishes.slice(0, 5).map((d) => ({
             name: d.name,
-            emoji: d.emoji || "🍽️",
+            emoji: cleanEmoji(d.emoji, "🍽️"),
             description: d.description || "",
             estimatedMinutes: Math.max(1, Math.min(600, Math.round(d.estimatedMinutes ?? timeMinutes))),
             whyFits: d.whyFits ?? "",

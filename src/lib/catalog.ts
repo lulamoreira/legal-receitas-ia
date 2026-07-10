@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { AISLES, type Aisle, type Ingredient, type Recipe } from "./types";
 import { uid } from "./format";
+import { cleanEmoji } from "./emoji";
 
 export const CATALOG_PAGE_SIZE = 20;
 
@@ -32,7 +33,7 @@ function toIngredient(raw: unknown): Ingredient {
     quantity: Number.isFinite(qty) ? qty : 0,
     unit: String(r.unit ?? ""),
     note: r.note ? String(r.note) : undefined,
-    emoji: String(r.emoji ?? "🍽️"),
+    emoji: cleanEmoji(r.emoji, "🥄"),
     aisle: toAisle(r.aisle),
     imageUrl: typeof imgRaw === "string" && imgRaw ? imgRaw : undefined,
   };
@@ -46,7 +47,7 @@ export function catalogRowToRecipe(row: CatalogRow): Recipe {
     id: row.id,
     title: row.title,
     description: row.description ?? "",
-    emoji: row.emoji ?? "🍽️",
+    emoji: cleanEmoji(row.emoji, "🍽️"),
     servings: row.servings,
     totalMinutes: row.total_minutes,
     tags: row.tags ?? [],

@@ -10,6 +10,7 @@ import {
   RecipeExtractionError,
 } from "@/lib/recipe-extraction.server";
 import { enrichRecipeWithImages } from "@/lib/image-generation.server";
+import { cleanEmoji } from "@/lib/emoji";
 
 const HOUR_MS = 60 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 10_000;
